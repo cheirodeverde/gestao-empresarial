@@ -78,6 +78,9 @@
         <div class="menu-item" onclick="irParaPagina('crm')">
             <i class="fas fa-users" style="width: 20px;"></i><span>CRM</span>
         </div>
+<div class="menu-item" onclick="irParaPagina('clientes')">
+    <i class="fas fa-address-book" style="width: 20px;"></i><span>Clientes</span>
+</div>
         <div class="menu-item" onclick="irParaPagina('pedidos')">
             <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos</span>
         </div>
@@ -243,6 +246,63 @@
                 <button class="btn btn-primary" onclick="abrirModalNovoNegocio()">+ Novo Negócio</button>
             </div>
             <div id="kanbanBoard" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px;"></div>
+        </div>
+
+<!-- CLIENTES -->
+        <div id="page-clientes" class="page-content hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <h2 style="font-size: 24px; font-weight: bold;">Clientes</h2>
+                <button onclick="exportarClientes()" class="btn" style="background: #16a34a; color: white;">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+            </div>
+
+            <!-- Estatísticas -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px;">
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Total de Clientes</p>
+                    <p id="totalClientes" style="font-size: 28px; font-weight: bold;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Clientes Ativos</p>
+                    <p id="clientesAtivos" style="font-size: 28px; font-weight: bold; color: #16a34a;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Clientes Inativos</p>
+                    <p id="clientesInativos" style="font-size: 28px; font-weight: bold; color: #6b7280;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Valor Total</p>
+                    <p id="valorTotalClientes" style="font-size: 24px; font-weight: bold; color: #3b82f6;">R$ 0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Ticket Médio</p>
+                    <p id="ticketMedioClientes" style="font-size: 24px; font-weight: bold; color: #f59e0b;">R$ 0</p>
+                </div>
+            </div>
+
+            <!-- Busca e Filtros -->
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                <div style="position: relative; flex: 1;">
+                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                    <input type="text" id="buscaCliente" onkeyup="renderizarClientes()" placeholder="Buscar por nome, telefone ou email..." style="width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                </div>
+                <select id="filtroStatusCliente" onchange="renderizarClientes()" style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="todos">Todos</option>
+                    <option value="ativos">Ativos</option>
+                    <option value="inativos">Inativos</option>
+                    <option value="vip">VIP (+ de 3 compras)</option>
+                </select>
+            </div>
+
+            <!-- Lista de Clientes -->
+            <div id="listaClientes"></div>
+
+            <div id="mensagemSemClientes" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
+                <i class="fas fa-users" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Nenhum cliente cadastrado</p>
+                <p style="font-size: 14px;">Cadastre negócios no CRM para criar clientes automaticamente</p>
+            </div>
         </div>
 
         <!-- PEDIDOS -->
@@ -618,6 +678,17 @@
             </div>
         </form>
     </div>
+
+<div id="modalHistoricoCliente" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 800px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 style="font-size: 20px; font-weight: bold;">Histórico do Cliente</h3>
+            <button type="button" onclick="fecharModalHistoricoCliente()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <div id="dadosClienteHistorico" style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📋 Histórico de Negócios</h4>
+        <div id="historicoNegociosCliente"></div>
+ </div>
 </div>
 
 <script>
@@ -708,13 +779,14 @@ function irParaPagina(pageName) {
         if (menuItem) menuItem.classList.add('active');
     }
     
-    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', pedidos: 'Pedidos Enviados', acoes: 'Ações' };
+    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', clientes: 'Clientes', pedidos: 'Pedidos Enviados', acoes: 'Ações' };
     document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
     
     if (pageName === 'dashboard') atualizarDashboard();
     if (pageName === 'faturamento') renderizarCanais();
     if (pageName === 'dre') atualizarDRE();
     if (pageName === 'crm') renderizarKanban();
+if (pageName === 'clientes') renderizarClientes();
     if (pageName === 'pedidos') renderizarPedidosMes();
     if (pageName === 'acoes') renderizarAcoes();
 }
@@ -1950,6 +2022,350 @@ function excluirAcao(id) {
     }
 }
 
+// ==========================================
+// PÁGINA DE CLIENTES
+// ==========================================
+
+function gerarListaClientes() {
+    const clientesMap = {};
+
+    // Percorrer todos os negócios e agrupar por cliente
+    negocios.forEach(negocio => {
+        const nomeCliente = negocio.cliente;
+        
+        if (!clientesMap[nomeCliente]) {
+            clientesMap[nomeCliente] = {
+                nome: nomeCliente,
+                telefone: negocio.telefone || '',
+                email: negocio.email || '',
+                negocios: [],
+                valorTotal: 0,
+                ultimaCompra: null,
+                primeiroContato: negocio.dataCriacao,
+                canal: negocio.canal || ''
+            };
+        }
+
+        clientesMap[nomeCliente].negocios.push({
+            id: negocio.id,
+            titulo: negocio.titulo,
+            valor: negocio.valor,
+            data: negocio.dataFechamento || negocio.dataCriacao,
+            etapa: negocio.etapaId
+        });
+
+        clientesMap[nomeCliente].valorTotal += negocio.valor;
+
+        // Atualizar última compra
+        const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
+        if (negocio.etapaId === etapaFechada?.id && negocio.dataFechamento) {
+            const dataCompra = new Date(negocio.dataFechamento);
+            if (!clientesMap[nomeCliente].ultimaCompra || dataCompra > new Date(clientesMap[nomeCliente].ultimaCompra)) {
+                clientesMap[nomeCliente].ultimaCompra = negocio.dataFechamento;
+            }
+        }
+
+        // Atualizar telefone/email se estiver vazio
+        if (!clientesMap[nomeCliente].telefone && negocio.telefone) {
+            clientesMap[nomeCliente].telefone = negocio.telefone;
+        }
+        if (!clientesMap[nomeCliente].email && negocio.email) {
+            clientesMap[nomeCliente].email = negocio.email;
+        }
+    });
+
+    return Object.values(clientesMap);
+}
+
+function renderizarClientes() {
+    const container = document.getElementById('listaClientes');
+    const mensagem = document.getElementById('mensagemSemClientes');
+    if (!container || !mensagem) return;
+
+    let clientes = gerarListaClientes();
+
+    // Filtros
+    const busca = document.getElementById('buscaCliente')?.value.toLowerCase() || '';
+    const filtroStatus = document.getElementById('filtroStatusCliente')?.value || 'todos';
+
+    // Aplicar busca
+    if (busca) {
+        clientes = clientes.filter(c => 
+            c.nome.toLowerCase().includes(busca) ||
+            (c.telefone && c.telefone.toLowerCase().includes(busca)) ||
+            (c.email && c.email.toLowerCase().includes(busca))
+        );
+    }
+
+    // Aplicar filtro de status
+    const hoje = new Date();
+    const diasInativo = 90; // Cliente inativo se não comprou em 90 dias
+
+    if (filtroStatus === 'ativos') {
+        clientes = clientes.filter(c => {
+            if (!c.ultimaCompra) return false;
+            const diasDesdeCompra = (hoje - new Date(c.ultimaCompra)) / (1000 * 60 * 60 * 24);
+            return diasDesdeCompra <= diasInativo;
+        });
+    } else if (filtroStatus === 'inativos') {
+        clientes = clientes.filter(c => {
+            if (!c.ultimaCompra) return true;
+            const diasDesdeCompra = (hoje - new Date(c.ultimaCompra)) / (1000 * 60 * 60 * 24);
+            return diasDesdeCompra > diasInativo;
+        });
+    } else if (filtroStatus === 'vip') {
+        clientes = clientes.filter(c => c.negocios.length >= 3);
+    }
+
+    // Ordenar alfabeticamente
+    clientes.sort((a, b) => a.nome.localeCompare(b.nome));
+
+    if (clientes.length === 0) {
+        container.innerHTML = '';
+        mensagem.classList.remove('hidden');
+        atualizarEstatisticasClientes([]);
+        return;
+    }
+
+    mensagem.classList.add('hidden');
+
+    container.innerHTML = clientes.map(cliente => {
+        const qtdNegocios = cliente.negocios.length;
+        const ticketMedio = qtdNegocios > 0 ? cliente.valorTotal / qtdNegocios : 0;
+        
+        // Verificar se é ativo
+        let statusCliente = 'inativo';
+        let corStatus = '#6b7280';
+        let labelStatus = 'Inativo';
+        
+        if (cliente.ultimaCompra) {
+            const diasDesdeCompra = (hoje - new Date(cliente.ultimaCompra)) / (1000 * 60 * 60 * 24);
+            if (diasDesdeCompra <= diasInativo) {
+                statusCliente = 'ativo';
+                corStatus = '#16a34a';
+                labelStatus = 'Ativo';
+            }
+        }
+
+        const isVIP = qtdNegocios >= 3;
+
+        return `
+            <div class="card" style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 56px; height: 56px; border-radius: 50%; background: ${corStatus}20; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 24px; font-weight: bold; color: ${corStatus};">
+                                    ${cliente.nome.charAt(0).toUpperCase()}
+                                </span>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 18px; font-weight: 600;">${cliente.nome}</h3>
+                                    <span style="background: ${corStatus}20; color: ${corStatus}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${labelStatus}
+                                    </span>
+                                    ${isVIP ? '<span style="background: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">⭐ VIP</span>' : ''}
+                                </div>
+                                <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
+                                    ${cliente.telefone ? `<span><i class="fas fa-phone"></i> ${cliente.telefone}</span>` : ''}
+                                    ${cliente.email ? `<span><i class="fas fa-envelope"></i> ${cliente.email}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">💰 Valor Total</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🛒 Negócios</p>
+                                <p style="font-size: 18px; font-weight: bold;">${qtdNegocios}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📊 Ticket Médio</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📅 Última Compra</p>
+                                <p style="font-size: 14px; font-weight: 600;">${cliente.ultimaCompra ? new Date(cliente.ultimaCompra).toLocaleDateString('pt-BR') : 'Nunca'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
+                        ${cliente.telefone ? `
+                            <button onclick="abrirWhatsAppDireto('${cliente.telefone}', '${cliente.nome}')" class="btn" style="background: #25D366; color: white; padding: 8px 16px;">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        ` : ''}
+                        ${cliente.email ? `
+                            <button onclick="abrirEmailCliente('${cliente.email}', '${cliente.nome}')" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                        ` : ''}
+                        <button onclick="abrirModalHistoricoCliente('${cliente.nome}')" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px;">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    atualizarEstatisticasClientes(clientes);
+}
+
+function atualizarEstatisticasClientes(clientes) {
+    const total = clientes.length;
+    
+    const hoje = new Date();
+    const diasInativo = 90;
+    
+    const ativos = clientes.filter(c => {
+        if (!c.ultimaCompra) return false;
+        const diasDesdeCompra = (hoje - new Date(c.ultimaCompra)) / (1000 * 60 * 60 * 24);
+        return diasDesdeCompra <= diasInativo;
+    }).length;
+
+    const inativos = total - ativos;
+    const valorTotal = clientes.reduce((sum, c) => sum + c.valorTotal, 0);
+    const ticketMedio = total > 0 ? valorTotal / total : 0;
+
+    document.getElementById('totalClientes').textContent = total;
+    document.getElementById('clientesAtivos').textContent = ativos;
+    document.getElementById('clientesInativos').textContent = inativos;
+    document.getElementById('valorTotalClientes').textContent = 'R$ ' + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('ticketMedioClientes').textContent = 'R$ ' + ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+}
+
+function abrirEmailCliente(email, nome) {
+    const assunto = 'Contato - ' + nome;
+    const corpo = 'Olá ' + nome + ',\n\n';
+    window.open('mailto:' + email + '?subject=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(corpo), '_blank');
+}
+
+function abrirModalHistoricoCliente(nomeCliente) {
+    const cliente = gerarListaClientes().find(c => c.nome === nomeCliente);
+    if (!cliente) return;
+
+    const qtdNegocios = cliente.negocios.length;
+    const ticketMedio = qtdNegocios > 0 ? cliente.valorTotal / qtdNegocios : 0;
+
+    document.getElementById('dadosClienteHistorico').innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Cliente</p>
+                <p style="font-size: 18px; font-weight: bold;">${cliente.nome}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Telefone</p>
+                <p style="font-size: 16px; font-weight: 600;">${cliente.telefone || 'Não informado'}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Email</p>
+                <p style="font-size: 16px; font-weight: 600;">${cliente.email || 'Não informado'}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total Gasto</p>
+                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total de Negócios</p>
+                <p style="font-size: 18px; font-weight: bold;">${qtdNegocios}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Ticket Médio</p>
+                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+            </div>
+        </div>
+    `;
+
+    // Ordenar negócios por data (mais recente primeiro)
+    const negociosOrdenados = [...cliente.negocios].sort((a, b) => new Date(b.data) - new Date(a.data));
+
+    const historicoContainer = document.getElementById('historicoNegociosCliente');
+    historicoContainer.innerHTML = negociosOrdenados.map(n => {
+        const etapa = etapasPipeline.find(e => e.id === n.etapa);
+        const etapaNome = etapa ? etapa.nome : 'Desconhecida';
+        const etapaCor = etapa ? etapa.cor : '#6b7280';
+
+        return `
+            <div style="border-left: 4px solid ${etapaCor}; background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <h4 style="font-size: 16px; font-weight: 600;">${n.titulo}</h4>
+                    <span style="background: ${etapaCor}20; color: ${etapaCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                        ${etapaNome}
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <p style="font-size: 14px; color: #6b7280;">
+                        <i class="fas fa-calendar"></i> ${new Date(n.data).toLocaleDateString('pt-BR')}
+                    </p>
+                    <p style="font-size: 18px; font-weight: bold; color: #16a34a;">
+                        R$ ${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </p>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById('modalHistoricoCliente').classList.remove('hidden');
+}
+
+function fecharModalHistoricoCliente() {
+    document.getElementById('modalHistoricoCliente').classList.add('hidden');
+}
+
+function exportarClientes() {
+    const clientes = gerarListaClientes();
+
+    if (clientes.length === 0) {
+        alert('❌ Nenhum cliente para exportar!');
+        return;
+    }
+
+    // Ordenar alfabeticamente
+    clientes.sort((a, b) => a.nome.localeCompare(b.nome));
+
+    // Gerar CSV
+    let csv = 'LISTA DE CLIENTES\n\n';
+    csv += 'Nome;Telefone;Email;Total de Negócios;Valor Total;Ticket Médio;Última Compra;Status\n';
+
+    const hoje = new Date();
+    const diasInativo = 90;
+
+    clientes.forEach(c => {
+        const qtdNegocios = c.negocios.length;
+        const ticketMedio = qtdNegocios > 0 ? c.valorTotal / qtdNegocios : 0;
+        
+        let status = 'Inativo';
+        if (c.ultimaCompra) {
+            const diasDesdeCompra = (hoje - new Date(c.ultimaCompra)) / (1000 * 60 * 60 * 24);
+            if (diasDesdeCompra <= diasInativo) {
+                status = 'Ativo';
+            }
+        }
+
+        const ultimaCompra = c.ultimaCompra ? new Date(c.ultimaCompra).toLocaleDateString('pt-BR') : 'Nunca';
+
+        csv += `${c.nome};${c.telefone || ''};${c.email || ''};${qtdNegocios};${c.valorTotal.toFixed(2)};${ticketMedio.toFixed(2)};${ultimaCompra};${status}\n`;
+    });
+
+    csv += `\nTOTAL DE CLIENTES: ${clientes.length}\n`;
+    csv += `GERADO EM: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\n`;
+
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'clientes-' + new Date().toISOString().split('T')[0] + '.csv';
+    link.click();
+
+    alert('✅ Lista de clientes exportada!\n\n' + clientes.length + ' cliente(s) exportado(s)');
+}
+
 // INICIALIZAÇÃO
 window.addEventListener('load', async function() {
     await carregarDados();
@@ -1969,6 +2385,23 @@ setInterval(function() {
         atualizarDashboard();
     }
 }, 60000);
+
+</script>   
+    </div>
+</div>
+
+<!-- Modal: Histórico do Cliente -->
+<div id="modalHistoricoCliente" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 800px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 style="font-size: 20px; font-weight: bold;">Histórico do Cliente</h3>
+            <button type="button" onclick="fecharModalHistoricoCliente()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <div id="dadosClienteHistorico" style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 24px;"></div>
+        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📋 Histórico de Negócios</h4>
+        <div id="historicoNegociosCliente"></div>
+    </div>
+</div>
 
 </script>
 </body>
