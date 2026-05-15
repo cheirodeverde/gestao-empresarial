@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Empresarial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f3f4f6; }
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: #1f2937; color: white; overflow-y: auto; z-index: 100; }
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .menu-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 8px; margin: 4px 12px; transition: all 0.2s; }
+        .menu-item:hover { background: #374151; }
+        .menu-item.active { background: #3b82f6; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 24px; }
+        .metric-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .metric-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(-2px); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: #dcfce7; color: #16a34a; }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .badge-danger { background: #fee2e2; color: #dc2626; }
+        .badge-info { background: #dbeafe; color: #2563eb; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width 0.3s; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .hidden { display: none !important; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: white; border-radius: 12px; padding: 32px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .kanban-column { min-width: 300px; background: #f9fafb; border-radius: 12px; padding: 16px; max-height: 70vh; overflow-y: auto; }
+        .kanban-card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: move; border-left: 4px solid; transition: all 0.2s; }
+        .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div id="telaLogin" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; z-index: 99999;">
+    <div style="background: white; border-radius: 16px; padding: 40px; max-width: 400px; width: 90%;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-lock" style="font-size: 36px; color: white;"></i>
+            </div>
+            <h2 style="font-size: 24px; font-weight: bold;">Acesso Restrito</h2>
+        </div>
+        <form onsubmit="fazerLogin(event)">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Senha</label>
+                <input type="password" id="senhaLogin" required autofocus style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            </div>
+            <div id="erroLogin" class="hidden" style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">❌ Senha incorreta!</div>
+            <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Entrar</button>
+        </form>
+       </div>
+</div>
+
+<div class="sidebar">
+    <div style="padding: 20px; border-bottom: 1px solid #374151;">
+        <h2 style="font-size: 20px; font-weight: bold;">Minha Empresa</h2>
+    </div>
+    <nav style="padding: 20px 0;">
+        <div class="menu-item active" onclick="irParaPagina('dashboard')">
+            <i class="fas fa-chart-line" style="width: 20px;"></i><span>Dashboard</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('faturamento')">
+            <i class="fas fa-dollar-sign" style="width: 20px;"></i><span>Faturamento</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('dre')">
+            <i class="fas fa-file-invoice" style="width: 20px;"></i><span>DRE</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('crm')">
+            <i class="fas fa-users" style="width: 20px;"></i><span>CRM</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('pedidos')">
+            <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('acoes')">
+            <i class="fas fa-bullseye" style="width: 20px;"></i><span>Ações</span>
+        </div>
+    </nav>
+    <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
+        <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
+            <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <header style="background: white; padding: 20px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <h1 id="page-title" style="font-size: 24px; font-weight: bold;">Dashboard Principal</h1>
+                <span id="statusFirebase" style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #16a34a; background: #dcfce7; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
+                    <span style="width: 8px; height: 8px; background: #16a34a; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                    Firebase OK
+                </span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="exportarBackup()" class="btn" style="background: #16a34a; color: white; padding: 8px 16px;">
+                    <i class="fas fa-download"></i> Backup
+                </button>
+                <button onclick="importarBackup()" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px;">
+                    <i class="fas fa-upload"></i> Restaurar
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div style="padding: 40px;">
+
+<!-- DASHBOARD -->
+        <div id="page-dashboard" class="page-content">
+            <div id="alertasDashboard" style="margin-bottom: 24px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                <div class="metric-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-dollar-sign" style="color: #3b82f6; font-size: 20px;"></i>
+                        </div>
+                        <span class="badge" id="badgeCrescimento">0%</span>
+                    </div>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Faturamento Mensal</p>
+                    <p id="dashFaturamentoMensal" style="font-size: 28px; font-weight: bold;">R$ 0</p>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280;">
+                            <span>Meta:</span>
+                            <span id="dashMetaMensal" style="font-weight: 600;">R$ 0</span>
+                        </div>
+                        <div class="progress-bar" style="margin-top: 8px;">
+                            <div id="progressoMeta" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="width: 48px; height: 48px; background: #dcfce7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-users" style="color: #16a34a; font-size: 20px;"></i>
+                        </div>
+                    </div>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Negócios Ativos</p>
+                    <p id="dashNegociosAtivos" style="font-size: 28px; font-weight: bold;">0</p>
+                </div>
+
+                <div class="metric-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-box" style="color: #f59e0b; font-size: 20px;"></i>
+                        </div>
+                    </div>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Pedidos Enviados</p>
+                    <p id="dashPedidosEnviados" style="font-size: 28px; font-weight: bold;">0</p>
+                </div>
+
+                <div class="metric-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="width: 48px; height: 48px; background: #f3e8ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-chart-line" style="color: #9333ea; font-size: 20px;"></i>
+                        </div>
+                        <span id="badgeVariacaoMes" class="badge badge-success">0%</span>
+                    </div>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">vs Mês Anterior</p>
+                    <p id="dashComparativoMes" style="font-size: 28px; font-weight: bold;">R$ 0</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+                <div class="card">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">📈 Faturamento Últimos 6 Meses</h3>
+                    <canvas id="graficoFaturamento" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">📊 Por Canal</h3>
+                    <canvas id="graficoCanais" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+                <div class="card">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">📋 Resumo Semanal</h3>
+                    <div id="resumoExecutivo"></div>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">🏆 Top 5 Clientes</h3>
+                    <div id="topClientes"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px; font-weight: 600;">✅ Tarefas do Dia</h3>
+                    <button onclick="abrirModalNovaTarefa()" class="btn btn-primary" style="padding: 8px 16px;">+ Nova</button>
+                </div>
+                <div id="listaTarefas"></div>
+            </div>
+
+            <div class="card" style="background: #eff6ff; border: 2px solid #3b82f6;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #1e40af; margin-bottom: 8px;">🎯 Meta Mensal</h3>
+                        <p style="color: #6b7280; font-size: 14px;">Configure sua meta de faturamento</p>
+                    </div>
+                    <button onclick="abrirModalConfigurarMeta()" class="btn" style="background: #3b82f6; color: white;">
+                        <i class="fas fa-cog"></i> Configurar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FATURAMENTO -->
+        <div id="page-faturamento" class="page-content hidden">
+            <button class="btn btn-primary" onclick="abrirModalNovoCanal()" style="margin-bottom: 24px;">+ Novo Canal</button>
+            <div id="canaisContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;"></div>
+        </div>
+
+        <!-- DRE -->
+        <div id="page-dre" class="page-content hidden">
+            <button class="btn btn-primary" onclick="abrirModalNovoGasto()" style="margin-bottom: 24px;">+ Novo Gasto</button>
+            <div class="card">
+                <h3 style="font-weight: 600; margin-bottom: 16px;">Receitas</h3>
+                <div id="listaReceitasDRE"></div>
+            </div>
+            <div class="card">
+                <h3 style="font-weight: 600; margin-bottom: 16px;">Despesas</h3>
+                <div id="listaDespesasDRE"></div>
+            </div>
+        </div>
+
+        <!-- CRM -->
+        <div id="page-crm" class="page-content hidden">
+            <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                <button class="btn" style="background: #6b7280; color: white;" onclick="abrirModalGerenciarColunas()">
+                    <i class="fas fa-columns"></i> Gerenciar Colunas
+                </button>
+                <button class="btn btn-primary" onclick="abrirModalNovoNegocio()">+ Novo Negócio</button>
+            </div>
+            <div id="kanbanBoard" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px;"></div>
+        </div>
+
+        <!-- PEDIDOS -->
+        <div id="page-pedidos" class="page-content hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <h2 style="font-size: 24px; font-weight: bold;">Pedidos Enviados</h2>
+                <select id="mesPedidos" onchange="renderizarPedidosMes()" style="padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-weight: 500;">
+                    <option value="atual">Mês Atual</option>
+                    <option value="anterior">Mês Anterior</option>
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; margin-bottom: 32px;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+                    <div>
+                        <p style="opacity: 0.9; font-size: 14px; margin-bottom: 4px;">Total de Pedidos</p>
+                        <p id="totalPedidosMes" style="font-size: 32px; font-weight: bold;">0</p>
+                    </div>
+                    <div>
+                        <p style="opacity: 0.9; font-size: 14px; margin-bottom: 4px;">Valor Total</p>
+                        <p id="valorTotalPedidosMes" style="font-size: 32px; font-weight: bold;">R$ 0</p>
+                    </div>
+                    <div>
+                        <p style="opacity: 0.9; font-size: 14px; margin-bottom: 4px;">Ticket Médio</p>
+                        <p id="ticketMedioPedidos" style="font-size: 32px; font-weight: bold;">R$ 0</p>
+                    </div>
+                    <div>
+                        <p style="opacity: 0.9; font-size: 14px; margin-bottom: 4px;">Com NF</p>
+                        <p id="totalNFsMes" style="font-size: 32px; font-weight: bold;">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="listaPedidosPorDia"></div>
+            <div id="mensagemSemPedidosEnviados" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
+                <i class="fas fa-box-open" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                <p style="font-size: 18px; font-weight: 600;">Nenhum pedido enviado</p>
+                <p style="font-size: 14px;">Arraste negócios para "Pedido Enviado" no CRM</p>
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div id="page-acoes" class="page-content hidden">
+            <button class="btn btn-primary" onclick="abrirModalNovaAcao()" style="margin-bottom: 24px;">+ Nova Ação</button>
+            <div id="gridAcoes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAIS -->
+
+<div id="modalNovoCanal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Canal</h3>
+        <form onsubmit="salvarNovoCanal(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Nome *</label>
+                <input type="text" id="nomeCanal" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Ícone</label>
+                <select id="iconeCanal" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="fa-globe">🌐 E-commerce</option>
+                    <option value="fa-store">🏪 Loja</option>
+                    <option value="fa-shopping-bag">🛍️ Marketplace</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cor</label>
+                <select id="corCanal" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="#3b82f6">🔵 Azul</option>
+                    <option value="#16a34a">🟢 Verde</option>
+                    <option value="#f59e0b">🟡 Amarelo</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalNovoCanal()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalLancarVenda" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Lançar Venda</h3>
+        <form onsubmit="salvarVenda(event)">
+            <input type="hidden" id="vendaCanalId">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Data *</label>
+                <input type="date" id="vendaData" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Valor (R$) *</label>
+                <input type="number" id="vendaValor" step="0.01" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Descrição</label>
+                <input type="text" id="vendaDescricao" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalLancarVenda()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Lançar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalNovoGasto" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Gasto</h3>
+        <form onsubmit="salvarNovoGasto(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Data *</label>
+                <input type="date" id="gastoData" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Categoria *</label>
+                <select id="gastoCategoria" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="">Selecione</option>
+                    <option value="Pessoal">💼 Pessoal</option>
+                    <option value="Marketing">📢 Marketing</option>
+                    <option value="Aluguel">🏢 Aluguel</option>
+                    <option value="Fornecedores">📦 Fornecedores</option>
+                    <option value="Utilidades">💡 Utilidades</option>
+                    <option value="Tecnologia">💻 Tecnologia</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Descrição *</label>
+                <input type="text" id="gastoDescricao" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Valor (R$) *</label>
+                <input type="number" id="gastoValor" step="0.01" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalNovoGasto()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalNovoNegocio" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Negócio</h3>
+        <form onsubmit="salvarNovoNegocio(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cliente *</label>
+                <input type="text" id="negocioCliente" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Título *</label>
+                <input type="text" id="negocioTitulo" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Valor (R$) *</label>
+                <input type="number" id="negocioValor" step="0.01" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Telefone</label>
+                <input type="tel" id="negocioTelefone" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(11) 98765-4321">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Email</label>
+                <input type="email" id="negocioEmail" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Canal</label>
+                <select id="negocioCanal" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="">Selecione</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalNovoNegocio()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Criar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalEditarNegocioCompleto" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 style="font-size: 20px; font-weight: bold;">Editar Negócio</h3>
+            <button type="button" onclick="fecharModalEditarNegocioCompleto()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <form onsubmit="salvarEdicaoNegocioCompleto(event)">
+            <input type="hidden" id="editarNegocioIdCompleto">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cliente *</label>
+                <input type="text" id="editarNegocioClienteCompleto" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Título *</label>
+                <input type="text" id="editarNegocioTituloCompleto" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Valor (R$) *</label>
+                <input type="number" id="editarNegocioValorCompleto" step="0.01" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Telefone</label>
+                <input type="tel" id="editarNegocioTelefoneCompleto" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Email</label>
+                <input type="email" id="editarNegocioEmailCompleto" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Canal</label>
+                <select id="editarNegocioCanalCompleto" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="">Selecione</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Observações</label>
+                <textarea id="editarNegocioObservacoesCompleto" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; resize: none;"></textarea>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalEditarNegocioCompleto()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalGerenciarColunas" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 700px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 style="font-size: 20px; font-weight: bold;">Gerenciar Colunas</h3>
+            <button type="button" onclick="fecharModalGerenciarColunas()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <button onclick="mostrarFormNovaColuna()" class="btn btn-primary" style="width: 100%; margin-bottom: 20px;">+ Adicionar Coluna</button>
+        <div id="formNovaColuna" class="hidden" style="background: #eff6ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <form onsubmit="salvarNovaColuna(event)">
+                <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px;">
+                    <input type="text" id="nomeNovaColuna" required placeholder="Nome da coluna" style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <select id="corNovaColuna" style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <option value="#3b82f6">🔵 Azul</option>
+                        <option value="#8b5cf6">🟣 Roxo</option>
+                        <option value="#f59e0b">🟡 Amarelo</option>
+                        <option value="#06b6d4">🔷 Ciano</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+        <div id="listaColunas"></div>
+        <div style="background: #dcfce7; border-left: 4px solid #16a34a; padding: 16px; border-radius: 8px; margin-top: 20px;">
+            <p style="font-size: 14px; color: #166534;">
+                <i class="fas fa-lock"></i> <strong>"Venda Fechada"</strong> é protegida e não pode ser excluída (usada para faturamento)
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="modalConfigurarMeta" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">🎯 Configurar Meta</h3>
+        <form onsubmit="salvarMetaMensal(event)">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Meta Mensal (R$) *</label>
+                <input type="number" id="valorMetaMensal" step="0.01" min="0" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            </div>
+            <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="font-size: 14px; color: #1e40af;">💡 Alertas em 50%, 80% e 100%</p>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalConfigurarMeta()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalNovaTarefa" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Tarefa</h3>
+        <form onsubmit="salvarNovaTarefa(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Descrição *</label>
+                <input type="text" id="descricaoTarefa" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Prioridade</label>
+                <select id="prioridadeTarefa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="baixa">🟢 Baixa</option>
+                    <option value="media">🟡 Média</option>
+                    <option value="alta">🔴 Alta</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalNovaTarefa()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Adicionar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalNovaAcao" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Ação</h3>
+        <form onsubmit="salvarNovaAcao(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Título *</label>
+                <input type="text" id="novaAcaoTitulo" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Responsável *</label>
+                <input type="text" id="novaAcaoResponsavel" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Orçamento (R$) *</label>
+                <input type="number" id="novaAcaoOrcamento" step="0.01" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Data Início *</label>
+                <input type="date" id="novaAcaoDataInicio" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Previsão *</label>
+                <input type="date" id="novaAcaoDataPrevista" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalNovaAcao()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Criar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalEditarPedidoEnviado" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 style="font-size: 20px; font-weight: bold;">Editar Pedido</h3>
+            <button type="button" onclick="fecharModalEditarPedidoEnviado()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <form onsubmit="salvarEdicaoPedidoEnviado(event)">
+            <input type="hidden" id="editarPedidoEnviadoId">
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="font-size: 12px; color: #6b7280;">Cliente</p>
+                <p id="pedidoEnviadoCliente" style="font-weight: 600;"></p>
+                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">Valor</p>
+                <p id="pedidoEnviadoValor" style="font-weight: 600; color: #16a34a;"></p>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Número da NF</label>
+                <input type="text" id="pedidoEnviadoNF" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Código de Rastreio</label>
+                <input type="text" id="pedidoEnviadoRastreio" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Transportadora</label>
+                <select id="pedidoEnviadoTransportadora" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="Correios">📮 Correios</option>
+                    <option value="Jadlog">📦 Jadlog</option>
+                    <option value="Total Express">🚚 Total Express</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Observações</label>
+                <textarea id="pedidoEnviadoObs" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; resize: none;"></textarea>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalEditarPedidoEnviado()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAah_gDGaF3vtR3YspXVJ0kOh_WCsJmHkY",
+  authDomain: "gestao-cheirodeverde.firebaseapp.com",
+  projectId: "gestao-cheirodeverde",
+  storageBucket: "gestao-cheirodeverde.firebasestorage.app",
+  messagingSenderId: "644245133396",
+  appId: "1:644245133396:web:fa63d3f8d77569f49f21ca"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+console.log('🔥 Firebase inicializado!');
+
+// AUTENTICAÇÃO
+const SENHA_MESTRA = 'Als392b5xv2@';
+
+function fazerLogin(event) {
+    event.preventDefault();
+    const senha = document.getElementById('senhaLogin').value;
+    if (senha === SENHA_MESTRA) {
+        sessionStorage.setItem('autenticado', 'true');
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('erroLogin').classList.add('hidden');
+    } else {
+        document.getElementById('erroLogin').classList.remove('hidden');
+        document.getElementById('senhaLogin').value = '';
+    }
+}
+
+function verificarAutenticacao() {
+    if (sessionStorage.getItem('autenticado') === 'true') {
+        document.getElementById('telaLogin').style.display = 'none';
+    }
+}
+
+function fazerLogout() {
+    if (confirm('Sair?')) {
+        sessionStorage.removeItem('autenticado');
+        location.reload();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', verificarAutenticacao);
+
+// VARIÁVEIS GLOBAIS
+let canaisVenda = [];
+let proximoIdCanal = 1;
+let gastos = [];
+let proximoIdGasto = 1;
+let etapasPipeline = [
+    { id: 1, nome: 'Lead', cor: '#3b82f6', fixo: false },
+    { id: 2, nome: 'Venda Fechada', cor: '#16a34a', fixo: true },
+    { id: 3, nome: 'Contato Inicial', cor: '#8b5cf6', fixo: false },
+    { id: 4, nome: 'Proposta Enviada', cor: '#f59e0b', fixo: false },
+    { id: 5, nome: 'Negociação', cor: '#06b6d4', fixo: false },
+    { id: 6, nome: 'Pedido Enviado', cor: '#ec4899', fixo: false }
+];
+let negocios = [];
+let proximoIdNegocio = 1;
+let negocioArrastando = null;
+let pedidos = [];
+let proximoIdPedido = 1;
+let acoes = [];
+let proximoIdAcao = 1;
+let metaMensal = 0;
+let tarefasDia = [];
+let proximoIdTarefa = 1;
+
+// REGISTROS PERMANENTES
+let vendasFechadasRegistro = [];
+let proximoIdVenda = 1;
+let pedidosEnviadosRegistro = [];
+let proximoIdPedidoEnviado = 1;
+
+// NAVEGAÇÃO
+function irParaPagina(pageName) {
+    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    const pagina = document.getElementById('page-' + pageName);
+    if (pagina) pagina.classList.remove('hidden');
+    
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    if (event && event.target) {
+        const menuItem = event.target.closest('.menu-item');
+        if (menuItem) menuItem.classList.add('active');
+    }
+    
+    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', pedidos: 'Pedidos Enviados', acoes: 'Ações' };
+    document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
+    
+    if (pageName === 'dashboard') atualizarDashboard();
+    if (pageName === 'faturamento') renderizarCanais();
+    if (pageName === 'dre') atualizarDRE();
+    if (pageName === 'crm') renderizarKanban();
+    if (pageName === 'pedidos') renderizarPedidosMes();
+    if (pageName === 'acoes') renderizarAcoes();
+}
+
+// SALVAR/CARREGAR
+async function salvarDados() {
+    try {
+        const dados = {
+            canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
+            etapasPipeline, negocios, proximoIdNegocio,
+            pedidos, proximoIdPedido, acoes, proximoIdAcao,
+            metaMensal, tarefasDia, proximoIdTarefa,
+            vendasFechadasRegistro, proximoIdVenda,
+            pedidosEnviadosRegistro, proximoIdPedidoEnviado,
+            ultimaAtualizacao: new Date().toISOString()
+        };
+        
+        await db.collection('empresas').doc('minha-empresa').set(dados);
+        localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+        console.log('💾 Salvo no Firebase e localmente!');
+    } catch(error) {
+        console.error('Erro Firebase:', error);
+        try {
+            const dados = {
+                canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
+                etapasPipeline, negocios, proximoIdNegocio,
+                pedidos, proximoIdPedido, acoes, proximoIdAcao,
+                metaMensal, tarefasDia, proximoIdTarefa,
+                vendasFechadasRegistro, proximoIdVenda,
+                pedidosEnviadosRegistro, proximoIdPedidoEnviado
+            };
+            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+            console.log('💾 Salvo localmente');
+        } catch(e) { console.log('Erro salvar'); }
+    }
+}
+
+async function carregarDados() {
+    try {
+        const doc = await db.collection('empresas').doc('minha-empresa').get();
+        
+        if (doc.exists) {
+            const dados = doc.data();
+            
+            canaisVenda = dados.canaisVenda || [];
+            proximoIdCanal = dados.proximoIdCanal || 1;
+            gastos = dados.gastos || [];
+            proximoIdGasto = dados.proximoIdGasto || 1;
+            etapasPipeline = dados.etapasPipeline || etapasPipeline;
+            negocios = dados.negocios || [];
+            proximoIdNegocio = dados.proximoIdNegocio || 1;
+            pedidos = dados.pedidos || [];
+            proximoIdPedido = dados.proximoIdPedido || 1;
+            acoes = dados.acoes || [];
+            proximoIdAcao = dados.proximoIdAcao || 1;
+            metaMensal = dados.metaMensal || 0;
+            tarefasDia = dados.tarefasDia || [];
+            proximoIdTarefa = dados.proximoIdTarefa || 1;
+            vendasFechadasRegistro = dados.vendasFechadasRegistro || [];
+            proximoIdVenda = dados.proximoIdVenda || 1;
+            pedidosEnviadosRegistro = dados.pedidosEnviadosRegistro || [];
+            proximoIdPedidoEnviado = dados.proximoIdPedidoEnviado || 1;
+            
+            console.log('☁️ Carregado do Firebase!');
+            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+        } else {
+            carregarDadosLocal();
+        }
+    } catch(error) {
+        console.error('Erro Firebase:', error);
+        carregarDadosLocal();
+    }
+}
+
+function carregarDadosLocal() {
+    try {
+        const dados = localStorage.getItem('sistemaGestao');
+        if (dados) {
+            const p = JSON.parse(dados);
+            canaisVenda = p.canaisVenda || [];
+            proximoIdCanal = p.proximoIdCanal || 1;
+            gastos = p.gastos || [];
+            proximoIdGasto = p.proximoIdGasto || 1;
+            etapasPipeline = p.etapasPipeline || etapasPipeline;
+            negocios = p.negocios || [];
+            proximoIdNegocio = p.proximoIdNegocio || 1;
+            pedidos = p.pedidos || [];
+            proximoIdPedido = p.proximoIdPedido || 1;
+            acoes = p.acoes || [];
+            proximoIdAcao = p.proximoIdAcao || 1;
+            metaMensal = p.metaMensal || 0;
+            tarefasDia = p.tarefasDia || [];
+            proximoIdTarefa = p.proximoIdTarefa || 1;
+            vendasFechadasRegistro = p.vendasFechadasRegistro || [];
+            proximoIdVenda = p.proximoIdVenda || 1;
+            pedidosEnviadosRegistro = p.pedidosEnviadosRegistro || [];
+            proximoIdPedidoEnviado = p.proximoIdPedidoEnviado || 1;
+            
+            console.log('💾 Carregado localmente!');
+        }
+    } catch(e) { console.log('Erro carregar'); }
+}
+
+// BACKUP MANUAL
+function exportarBackup() {
+    const backup = {
+        data: new Date().toISOString(),
+        versao: '2.0',
+        dados: {
+            canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
+            etapasPipeline, negocios, proximoIdNegocio,
+            pedidos, proximoIdPedido, acoes, proximoIdAcao,
+            metaMensal, tarefasDia, proximoIdTarefa,
+            vendasFechadasRegistro, proximoIdVenda,
+            pedidosEnviadosRegistro, proximoIdPedidoEnviado
+        }
+    };
+    
+    const dataStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'backup-gestao-' + new Date().toISOString().split('T')[0] + '.json';
+    link.click();
+    alert('✅ Backup realizado!');
+}
+
+function importarBackup() {
+    if (!confirm('⚠️ Substituir dados atuais?')) return;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const backup = JSON.parse(e.target.result);
+                const d = backup.dados;
+                
+                canaisVenda = d.canaisVenda || [];
+                proximoIdCanal = d.proximoIdCanal || 1;
+                gastos = d.gastos || [];
+                proximoIdGasto = d.proximoIdGasto || 1;
+                etapasPipeline = d.etapasPipeline || etapasPipeline;
+                negocios = d.negocios || [];
+                proximoIdNegocio = d.proximoIdNegocio || 1;
+                pedidos = d.pedidos || [];
+                proximoIdPedido = d.proximoIdPedido || 1;
+                acoes = d.acoes || [];
+                proximoIdAcao = d.proximoIdAcao || 1;
+                metaMensal = d.metaMensal || 0;
+                tarefasDia = d.tarefasDia || [];
+                proximoIdTarefa = d.proximoIdTarefa || 1;
+                vendasFechadasRegistro = d.vendasFechadasRegistro || [];
+                proximoIdVenda = d.proximoIdVenda || 1;
+                pedidosEnviadosRegistro = d.pedidosEnviadosRegistro || [];
+                proximoIdPedidoEnviado = d.proximoIdPedidoEnviado || 1;
+                
+                salvarDados();
+                location.reload();
+            } catch (error) {
+                alert('❌ Arquivo inválido!');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// DASHBOARD
+function atualizarDashboard() {
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+    
+    // USAR REGISTROS PERMANENTES
+    const vendasMesAtual = vendasFechadasRegistro.filter(v => {
+        const data = new Date(v.dataFechamento);
+        return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+    });
+
+    const faturamentoAtual = vendasMesAtual.reduce((sum, v) => sum + v.valor, 0);
+
+    const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+    const anoMesAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+    const vendasMesAnterior = vendasFechadasRegistro.filter(v => {
+        const data = new Date(v.dataFechamento);
+        return data.getMonth() === mesAnterior && data.getFullYear() === anoMesAnterior;
+    });
+
+    const faturamentoAnterior = vendasMesAnterior.reduce((sum, v) => sum + v.valor, 0);
+    const crescimento = faturamentoAnterior > 0 ? ((faturamentoAtual - faturamentoAnterior) / faturamentoAnterior) * 100 : 0;
+
+    document.getElementById('dashFaturamentoMensal').textContent = 'R$ ' + faturamentoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('dashMetaMensal').textContent = 'R$ ' + metaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    
+    const progressoMeta = metaMensal > 0 ? (faturamentoAtual / metaMensal) * 100 : 0;
+    document.getElementById('progressoMeta').style.width = Math.min(progressoMeta, 100) + '%';
+
+    const badgeCrescimento = document.getElementById('badgeCrescimento');
+    if (crescimento >= 0) {
+        badgeCrescimento.innerHTML = '<i class="fas fa-arrow-up"></i> +' + crescimento.toFixed(1) + '%';
+        badgeCrescimento.className = 'badge badge-success';
+    } else {
+        badgeCrescimento.innerHTML = '<i class="fas fa-arrow-down"></i> ' + crescimento.toFixed(1) + '%';
+        badgeCrescimento.className = 'badge badge-danger';
+    }
+
+    const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
+    const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
+    const negociosAtivos = negocios.filter(n => n.etapaId !== etapaFechada?.id && n.etapaId !== etapaPedidoEnviado?.id).length;
+    document.getElementById('dashNegociosAtivos').textContent = negociosAtivos;
+
+    const pedidosEnviados = pedidosEnviadosRegistro.length;
+    document.getElementById('dashPedidosEnviados').textContent = pedidosEnviados;
+
+    const diferenca = faturamentoAtual - faturamentoAnterior;
+    document.getElementById('dashComparativoMes').textContent = (diferenca >= 0 ? '+' : '') + 'R$ ' + diferenca.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    
+    const badgeVariacao = document.getElementById('badgeVariacaoMes');
+    if (crescimento >= 0) {
+        badgeVariacao.innerHTML = '<i class="fas fa-arrow-up"></i> +' + crescimento.toFixed(1) + '%';
+        badgeVariacao.className = 'badge badge-success';
+    } else {
+        badgeVariacao.innerHTML = '<i class="fas fa-arrow-down"></i> ' + Math.abs(crescimento).toFixed(1) + '%';
+        badgeVariacao.className = 'badge badge-danger';
+    }
+
+    renderizarGraficoFaturamento();
+    renderizarGraficoCanais();
+    renderizarResumoExecutivo();
+    renderizarTopClientes();
+    renderizarTarefasDia();
+    verificarAlertasMeta();
+}
+
+function renderizarGraficoFaturamento() {
+    const ctx = document.getElementById('graficoFaturamento');
+    if (!ctx) return;
+    if (window.chartFaturamento) window.chartFaturamento.destroy();
+
+    const meses = [];
+    const valores = [];
+    const metas = [];
+
+    for (let i = 5; i >= 0; i--) {
+        const data = new Date();
+        data.setMonth(data.getMonth() - i);
+        meses.push(data.toLocaleDateString('pt-BR', { month: 'short' }));
+
+        // USAR REGISTROS PERMANENTES
+        const vendasMes = vendasFechadasRegistro.filter(v => {
+            const dataV = new Date(v.dataFechamento);
+            return dataV.getMonth() === data.getMonth() && dataV.getFullYear() === data.getFullYear();
+        });
+        
+        valores.push(vendasMes.reduce((sum, v) => sum + v.valor, 0));
+        metas.push(metaMensal);
+    }
+
+    window.chartFaturamento = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: meses,
+            datasets: [{
+                label: 'Faturamento',
+                data: valores,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3
+            }, {
+                label: 'Meta',
+                data: metas,
+                borderColor: '#16a34a',
+                borderDash: [5, 5],
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderizarGraficoCanais() {
+    const ctx = document.getElementById('graficoCanais');
+    if (!ctx) return;
+    if (window.chartCanais) window.chartCanais.destroy();
+
+    const labels = [];
+    const valores = [];
+    const cores = [];
+
+    canaisVenda.forEach(canal => {
+        const vendas = canal.vendas || [];
+        const total = vendas.reduce((sum, v) => sum + v.valor, 0);
+        if (total > 0) {
+            labels.push(canal.nome);
+            valores.push(total);
+            cores.push(canal.cor);
+        }
+    });
+
+    if (valores.length === 0) return;
+
+    window.chartCanais = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: valores,
+                backgroundColor: cores,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percent = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR') + ' (' + percent + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderizarResumoExecutivo() {
+    const container = document.getElementById('resumoExecutivo');
+    if (!container) return;
+
+    const inicioSemana = new Date();
+    inicioSemana.setDate(inicioSemana.getDate() - 7);
+
+    // USAR REGISTROS PERMANENTES
+    const vendasSemana = vendasFechadasRegistro.filter(v => new Date(v.dataFechamento) >= inicioSemana);
+    const faturamentoSemana = vendasSemana.reduce((sum, v) => sum + v.valor, 0);
+    const novosNegocios = negocios.filter(n => new Date(n.dataCriacao) >= inicioSemana);
+    const gastosSemana = gastos.filter(g => new Date(g.data) >= inicioSemana);
+    const totalGastosSemana = gastosSemana.reduce((sum, g) => sum + g.valor, 0);
+    const resultado = faturamentoSemana - totalGastosSemana;
+
+    container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: #dcfce7; border-radius: 8px; margin-bottom: 8px;">
+            <span style="color: #166534; font-weight: 600;">💰 Vendas</span>
+            <span style="color: #16a34a; font-weight: bold;">${vendasSemana.length} (R$ ${faturamentoSemana.toLocaleString('pt-BR', {minimumFractionDigits: 2})})</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: #dbeafe; border-radius: 8px; margin-bottom: 8px;">
+            <span style="color: #1e40af; font-weight: 600;">📈 Novos Negócios</span>
+            <span style="color: #3b82f6; font-weight: bold;">${novosNegocios.length}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: #fee2e2; border-radius: 8px; margin-bottom: 8px;">
+            <span style="color: #991b1b; font-weight: 600;">💸 Gastos</span>
+            <span style="color: #dc2626; font-weight: bold;">R$ ${totalGastosSemana.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f3f4f6; border-radius: 8px;">
+            <span style="font-weight: 600;">📊 Resultado</span>
+            <span style="color: ${resultado >= 0 ? '#16a34a' : '#dc2626'}; font-weight: bold;">R$ ${resultado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+        </div>
+    `;
+}
+
+function renderizarTopClientes() {
+    const container = document.getElementById('topClientes');
+    if (!container) return;
+
+    // USAR REGISTROS PERMANENTES
+    if (vendasFechadasRegistro.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">Nenhuma venda</p>';
+        return;
+    }
+
+    const vendasPorCliente = {};
+    vendasFechadasRegistro.forEach(v => {
+        if (!vendasPorCliente[v.cliente]) {
+            vendasPorCliente[v.cliente] = { cliente: v.cliente, total: 0, quantidade: 0 };
+        }
+        vendasPorCliente[v.cliente].total += v.valor;
+        vendasPorCliente[v.cliente].quantidade++;
+    });
+
+    const top5 = Object.values(vendasPorCliente).sort((a, b) => b.total - a.total).slice(0, 5);
+
+    const medalhas = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+    container.innerHTML = top5.map((cliente, index) => `
+        <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb;">
+            <div style="display: flex; gap: 12px;">
+                <span style="font-size: 24px;">${medalhas[index]}</span>
+                <div>
+                    <p style="font-weight: 600;">${cliente.cliente}</p>
+                    <p style="font-size: 13px; color: #6b7280;">${cliente.quantidade} venda(s)</p>
+                </div>
+            </div>
+            <p style="font-weight: 700; color: #3b82f6; font-size: 16px;">R$ ${cliente.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+        </div>
+    `).join('');
+}
+
+function verificarAlertasMeta() {
+    const container = document.getElementById('alertasDashboard');
+    if (!container || metaMensal === 0) {
+        if (container) container.innerHTML = '';
+        return;
+    }
+
+    const hoje = new Date();
+    
+    // USAR REGISTROS PERMANENTES
+    const vendasMesAtual = vendasFechadasRegistro.filter(v => {
+        const data = new Date(v.dataFechamento);
+        return data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
+    });
+
+    const faturamentoAtual = vendasMesAtual.reduce((sum, v) => sum + v.valor, 0);
+    const percentualMeta = (faturamentoAtual / metaMensal) * 100;
+
+    let alertas = [];
+
+    if (percentualMeta >= 50 && percentualMeta < 80) {
+        alertas.push({ tipo: 'info', msg: '🎯 Meta 50% atingida! Continue!' });
+    }
+    if (percentualMeta >= 80 && percentualMeta < 100) {
+        alertas.push({ tipo: 'warning', msg: '🔥 Meta 80% atingida! Falta pouco!' });
+    }
+    if (percentualMeta >= 100) {
+        alertas.push({ tipo: 'success', msg: '🏆 PARABÉNS! Meta atingida! (' + percentualMeta.toFixed(1) + '%)' });
+    }
+    if (percentualMeta < 30 && hoje.getDate() > 15) {
+        alertas.push({ tipo: 'danger', msg: '⚠️ Atenção! Meta em ' + percentualMeta.toFixed(1) + '% (dia ' + hoje.getDate() + ')' });
+    }
+
+    const cores = {
+        info: { bg: '#dbeafe', text: '#1e40af' },
+        warning: { bg: '#fef3c7', text: '#92400e' },
+        success: { bg: '#dcfce7', text: '#166534' },
+        danger: { bg: '#fee2e2', text: '#991b1b' }
+    };
+
+    container.innerHTML = alertas.map(a => {
+        const c = cores[a.tipo];
+        return `<div style="background: ${c.bg}; padding: 16px; border-radius: 8px; margin-bottom: 12px;"><p style="color: ${c.text}; font-weight: 600;">${a.msg}</p></div>`;
+    }).join('');
+}
+
+function renderizarTarefasDia() {
+    const lista = document.getElementById('listaTarefas');
+    if (!lista) return;
+
+    const tarefasAtivas = tarefasDia.filter(t => !t.concluida);
+
+    if (tarefasAtivas.length === 0) {
+        lista.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">Nenhuma tarefa 🎉</p>';
+        return;
+    }
+
+    const corPrioridade = { baixa: '#16a34a', media: '#f59e0b', alta: '#dc2626' };
+
+    lista.innerHTML = tarefasAtivas.map(t => `
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px;">
+            <input type="checkbox" onchange="marcarTarefaConcluida(${t.id})" style="width: 20px; height: 20px; cursor: pointer;">
+            <p style="flex: 1; font-weight: 600;">${t.descricao}</p>
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: ${corPrioridade[t.prioridade]};"></span>
+            <button onclick="excluirTarefa(${t.id})" style="padding: 6px 10px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function abrirModalConfigurarMeta() {
+    document.getElementById('valorMetaMensal').value = metaMensal || '';
+    document.getElementById('modalConfigurarMeta').classList.remove('hidden');
+}
+
+function fecharModalConfigurarMeta() {
+    document.getElementById('modalConfigurarMeta').classList.add('hidden');
+}
+
+function salvarMetaMensal(event) {
+    event.preventDefault();
+    metaMensal = parseFloat(document.getElementById('valorMetaMensal').value);
+    fecharModalConfigurarMeta();
+    salvarDados();
+    atualizarDashboard();
+    alert('✅ Meta configurada! R$ ' + metaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
+}
+
+function abrirModalNovaTarefa() {
+    document.getElementById('modalNovaTarefa').classList.remove('hidden');
+}
+
+function fecharModalNovaTarefa() {
+    document.getElementById('modalNovaTarefa').classList.add('hidden');
+}
+
+function salvarNovaTarefa(event) {
+    event.preventDefault();
+    tarefasDia.push({
+        id: proximoIdTarefa++,
+        descricao: document.getElementById('descricaoTarefa').value,
+        prioridade: document.getElementById('prioridadeTarefa').value,
+        data: new Date().toISOString(),
+        concluida: false
+    });
+    renderizarTarefasDia();
+    fecharModalNovaTarefa();
+    document.getElementById('descricaoTarefa').value = '';
+    salvarDados();
+}
+
+function marcarTarefaConcluida(tarefaId) {
+    const tarefa = tarefasDia.find(t => t.id === tarefaId);
+    if (tarefa) {
+        tarefa.concluida = true;
+        renderizarTarefasDia();
+        salvarDados();
+    }
+}
+
+function excluirTarefa(tarefaId) {
+    if (confirm('Excluir?')) {
+        tarefasDia = tarefasDia.filter(t => t.id !== tarefaId);
+        renderizarTarefasDia();
+        salvarDados();
+    }
+}
+
+// FATURAMENTO
+function renderizarCanais() {
+    const c = document.getElementById('canaisContainer');
+    if (!c) return;
+    if (canaisVenda.length === 0) {
+        c.innerHTML = '<div class="card"><p style="text-align: center; padding: 40px; color: #6b7280;">Nenhum canal</p></div>';
+        return;
+    }
+    c.innerHTML = canaisVenda.map(canal => {
+        const vendas = canal.vendas || [];
+        const total = vendas.reduce((s, v) => s + v.valor, 0);
+        return `
+            <div class="metric-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                    <div style="width: 48px; height: 48px; background: ${canal.cor}20; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas $${canal.icone}" style="color: $${canal.cor}; font-size: 20px;"></i>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button onclick="abrirModalLancarVenda($${canal.id})" style="padding: 6px 10px; background: $${canal.cor}; color: white; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-plus"></i></button>
+                        <button onclick="excluirCanal(${canal.id})" style="padding: 6px 10px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">${canal.nome}</h3>
+                <p style="font-size: 28px; font-weight: bold; color: $${canal.cor}">R$$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">${vendas.length} vendas</p>
+            </div>
+        `;
+    }).join('');
+}
+
+function abrirModalNovoCanal() { document.getElementById('modalNovoCanal').classList.remove('hidden'); }
+function fecharModalNovoCanal() { document.getElementById('modalNovoCanal').classList.add('hidden'); }
+function salvarNovoCanal(event) {
+    event.preventDefault();
+    canaisVenda.push({
+        id: proximoIdCanal++,
+        nome: document.getElementById('nomeCanal').value,
+        icone: document.getElementById('iconeCanal').value,
+        cor: document.getElementById('corCanal').value,
+        vendas: []
+    });
+    renderizarCanais();
+    fecharModalNovoCanal();
+    salvarDados();
+    atualizarDashboard();
+    alert('✅ Canal criado!');
+}
+
+function excluirCanal(id) {
+    if (confirm('Excluir?')) {
+        canaisVenda = canaisVenda.filter(c => c.id !== id);
+        renderizarCanais();
+        salvarDados();
+        atualizarDashboard();
+    }
+}
+
+function abrirModalLancarVenda(canalId) {
+    document.getElementById('vendaCanalId').value = canalId;
+    document.getElementById('vendaData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalLancarVenda').classList.remove('hidden');
+}
+
+function fecharModalLancarVenda() { document.getElementById('modalLancarVenda').classList.add('hidden'); }
+function salvarVenda(event) {
+    event.preventDefault();
+    const canalId = parseInt(document.getElementById('vendaCanalId').value);
+    const canal = canaisVenda.find(c => c.id === canalId);
+    if (canal) {
+        if (!canal.vendas) canal.vendas = [];
+        canal.vendas.push({
+            data: document.getElementById('vendaData').value,
+            valor: parseFloat(document.getElementById('vendaValor').value),
+            descricao: document.getElementById('vendaDescricao').value || 'Venda'
+        });
+        renderizarCanais();
+        fecharModalLancarVenda();
+        salvarDados();
+        atualizarDashboard();
+        alert('✅ Venda lançada!');
+    }
+}
+
+// DRE
+function atualizarDRE() {
+    // USAR REGISTROS PERMANENTES
+    const vendasFechadas = vendasFechadasRegistro;
+    
+    const lr = document.getElementById('listaReceitasDRE');
+    if (lr) {
+        if (vendasFechadas.length === 0) {
+            lr.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">Nenhuma venda</p>';
+        } else {
+            lr.innerHTML = vendasFechadas.map(v => `
+                <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                    <div>
+                        <p style="font-weight: 600;">${v.cliente}</p>
+                        <p style="font-size: 14px; color: #6b7280;">$${v.titulo} - $${new Date(v.dataFechamento).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <p style="font-weight: 600; color: #16a34a;">R$ ${v.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                </div>
+            `).join('');
+        }
+    }
+
+    const ld = document.getElementById('listaDespesasDRE');
+    if (ld) {
+        if (gastos.length === 0) {
+            ld.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">Nenhum gasto</p>';
+        } else {
+            ld.innerHTML = gastos.map(g => `
+                <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb; align-items: center;">
+                    <div><p style="font-weight: 600;">${g.categoria}</p><p style="font-size: 14px; color: #6b7280;">${g.descricao}</p></div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <p style="font-weight: 600; color: #dc2626;">R$ ${g.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        <button onclick="excluirGasto(${g.id})" style="padding: 6px 10px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+function abrirModalNovoGasto() {
+    document.getElementById('gastoData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalNovoGasto').classList.remove('hidden');
+}
+
+function fecharModalNovoGasto() { document.getElementById('modalNovoGasto').classList.add('hidden'); }
+function salvarNovoGasto(event) {
+    event.preventDefault();
+    gastos.push({
+        id: proximoIdGasto++,
+        data: document.getElementById('gastoData').value,
+        categoria: document.getElementById('gastoCategoria').value,
+        descricao: document.getElementById('gastoDescricao').value,
+        valor: parseFloat(document.getElementById('gastoValor').value)
+    });
+    atualizarDRE();
+    fecharModalNovoGasto();
+    salvarDados();
+    alert('✅ Gasto lançado!');
+}
+
+function excluirGasto(id) {
+    if (confirm('Excluir?')) {
+        gastos = gastos.filter(g => g.id !== id);
+        atualizarDRE();
+        salvarDados();
+    }
+}
+
+// CRM
+function renderizarKanban() {
+    const board = document.getElementById('kanbanBoard');
+    if (!board) return;
+    board.innerHTML = '';
+
+    etapasPipeline.forEach(etapa => {
+        const negociosEtapa = negocios.filter(n => n.etapaId === etapa.id);
+        const total = negociosEtapa.reduce((s, n) => s + n.valor, 0);
+
+        const coluna = document.createElement('div');
+        coluna.className = 'kanban-column';
+        coluna.innerHTML = `
+            <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb;">
+                <h3 style="font-size: 16px; font-weight: 600; color: ${etapa.cor};">
+                    ${etapa.nome} ${etapa.fixo ? '🔒' : ''}
+                </h3>
+                <p style="font-size: 14px; color: #6b7280;">${negociosEtapa.length} • R$ ${total.toLocaleString('pt-BR')}</p>
+            </div>
+            <div ondrop="soltarCard(event, ${etapa.id})" ondragover="permitirSoltar(event)" style="min-height: 200px;">
+                ${negociosEtapa.map(n => `
+                    <div class="kanban-card" draggable="true" onmousedown="iniciarArrasto(${n.id})" style="border-left-color: ${etapa.cor};">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <h4 style="font-size: 15px; font-weight: 600; flex: 1;">${n.titulo}</h4>
+                            <div style="display: flex; gap: 4px;">
+                                <button onclick="abrirModalEditarNegocioCompleto(${n.id}); event.stopPropagation();" style="padding: 4px 8px; background: #eff6ff; color: #3b82f6; border: none; border-radius: 4px; cursor: pointer;" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="excluirNegocioDireto(${n.id}); event.stopPropagation();" style="padding: 4px 8px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; cursor: pointer;" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;"><i class="fas fa-user"></i> ${n.cliente}</p>
+                        <p style="font-size: 18px; font-weight: bold; color: ${etapa.cor};">R$ ${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        ${n.telefone ? `<button onclick="abrirWhatsAppDireto('${n.telefone}', '${n.cliente}'); event.stopPropagation();" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 8px;"><i class="fab fa-whatsapp"></i> WhatsApp</button>` : ''}
+                        ${n.observacoes ? `<div style="margin-top: 8px; padding: 8px; background: #fffbeb; border-radius: 4px; font-size: 12px; color: #92400e;">📝 ${n.observacoes}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        board.appendChild(coluna);
+    });
+}
+
+function iniciarArrasto(negocioId) { negocioArrastando = negocioId; }
+function permitirSoltar(event) { event.preventDefault(); }
+
+function soltarCard(event, novaEtapaId) {
+    event.preventDefault();
+    if (!negocioArrastando) return;
+    
+    const negocio = negocios.find(n => n.id === negocioArrastando);
+    if (!negocio) return;
+    
+    const etapaAnterior = negocio.etapaId;
+    negocio.etapaId = novaEtapaId;
+
+    // VENDA FECHADA - CRIAR REGISTRO PERMANENTE
+    const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
+    if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
+        
+        const jaRegistrado = vendasFechadasRegistro.find(v => v.negocioId === negocio.id);
+        
+        if (!jaRegistrado) {
+            const novaVenda = {
+                id: proximoIdVenda++,
+                negocioId: negocio.id,
+                cliente: negocio.cliente,
+                titulo: negocio.titulo,
+                valor: negocio.valor,
+                canal: negocio.canal,
+                dataFechamento: new Date().toISOString().split('T')[0],
+                dataHora: new Date().toISOString()
+            };
+            
+            vendasFechadasRegistro.push(novaVenda);
+            
+            if (negocio.canal) {
+                const canal = canaisVenda.find(c => c.id === parseInt(negocio.canal));
+                if (canal) {
+                    if (!canal.vendas) canal.vendas = [];
+                    canal.vendas.push({
+                        data: novaVenda.dataFechamento,
+                        valor: novaVenda.valor,
+                        descricao: novaVenda.titulo + ' - ' + novaVenda.cliente
+                    });
+                    alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n📊 Canal: ' + canal.nome + '\n\n✨ Pode mover o card agora - o faturamento ficará registrado!');
+                }
+            } else {
+                alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n\n✨ Pode mover o card - o faturamento fica registrado!');
+            }
+        } else {
+            alert('ℹ️ Venda já registrada em ' + new Date(jaRegistrado.dataFechamento).toLocaleDateString('pt-BR'));
+        }
+    }
+
+    // PEDIDO ENVIADO - CRIAR REGISTRO PERMANENTE
+    const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
+    if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
+        
+        const jaRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocio.id);
+        
+        if (!jaRegistrado) {
+            const novoPedido = {
+                id: proximoIdPedidoEnviado++,
+                negocioId: negocio.id,
+                cliente: negocio.cliente,
+                titulo: negocio.titulo,
+                valor: negocio.valor,
+                telefone: negocio.telefone,
+                dataEnvio: new Date().toISOString().split('T')[0],
+                numeroNF: '',
+                codigoRastreio: '',
+                transportadora: 'Correios',
+                observacoes: ''
+            };
+            
+            pedidosEnviadosRegistro.push(novoPedido);
+            
+            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + new Date().getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
+        } else {
+            alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
+        }
+    }
+
+    negocioArrastando = null;
+    salvarDados();
+    renderizarKanban();
+    atualizarDashboard();
+}
+
+function abrirModalNovoNegocio() {
+    const s = document.getElementById('negocioCanal');
+    if (s) {
+        s.innerHTML = '<option value="">Selecione</option>';
+        canaisVenda.forEach(c => s.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
+    }
+    document.getElementById('modalNovoNegocio').classList.remove('hidden');
+}
+
+function fecharModalNovoNegocio() { document.getElementById('modalNovoNegocio').classList.add('hidden'); }
+
+function salvarNovoNegocio(event) {
+    event.preventDefault();
+    
+    // Sempre começa na PRIMEIRA coluna (Lead)
+    const primeiraColuna = etapasPipeline[0];
+    
+    negocios.push({
+        id: proximoIdNegocio++,
+        cliente: document.getElementById('negocioCliente').value,
+        titulo: document.getElementById('negocioTitulo').value,
+        valor: parseFloat(document.getElementById('negocioValor').value),
+        telefone: document.getElementById('negocioTelefone').value,
+        email: document.getElementById('negocioEmail').value || '',
+        canal: document.getElementById('negocioCanal').value,
+        observacoes: '',
+        etapaId: primeiraColuna.id,  // Sempre primeira coluna
+        dataCriacao: new Date().toISOString()
+    });
+    
+    renderizarKanban();
+    fecharModalNovoNegocio();
+    
+    // LIMPAR FORMULÁRIO
+    document.getElementById('negocioCliente').value = '';
+    document.getElementById('negocioTitulo').value = '';
+    document.getElementById('negocioValor').value = '';
+    document.getElementById('negocioTelefone').value = '';
+    document.getElementById('negocioEmail').value = '';
+    document.getElementById('negocioCanal').value = '';
+    
+    salvarDados();
+    alert('✅ Negócio criado em "Lead"!');
+}
+function abrirModalEditarNegocioCompleto(negocioId) {
+    const n = negocios.find(x => x.id === negocioId);
+    if (!n) return;
+    document.getElementById('editarNegocioIdCompleto').value = n.id;
+    document.getElementById('editarNegocioClienteCompleto').value = n.cliente;
+    document.getElementById('editarNegocioTituloCompleto').value = n.titulo;
+    document.getElementById('editarNegocioValorCompleto').value = n.valor;
+    document.getElementById('editarNegocioTelefoneCompleto').value = n.telefone || '';
+    document.getElementById('editarNegocioEmailCompleto').value = n.email || '';
+    document.getElementById('editarNegocioObservacoesCompleto').value = n.observacoes || '';
+    
+    const s = document.getElementById('editarNegocioCanalCompleto');
+    if (s) {
+        s.innerHTML = '<option value="">Selecione</option>';
+        canaisVenda.forEach(c => s.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
+        s.value = n.canal || '';
+    }
+    document.getElementById('modalEditarNegocioCompleto').classList.remove('hidden');
+}
+
+function fecharModalEditarNegocioCompleto() { document.getElementById('modalEditarNegocioCompleto').classList.add('hidden'); }
+
+function salvarEdicaoNegocioCompleto(event) {
+    event.preventDefault();
+    const id = parseInt(document.getElementById('editarNegocioIdCompleto').value);
+    const n = negocios.find(x => x.id === id);
+    if (n) {
+        n.cliente = document.getElementById('editarNegocioClienteCompleto').value;
+        n.titulo = document.getElementById('editarNegocioTituloCompleto').value;
+        n.valor = parseFloat(document.getElementById('editarNegocioValorCompleto').value);
+        n.telefone = document.getElementById('editarNegocioTelefoneCompleto').value;
+        n.email = document.getElementById('editarNegocioEmailCompleto').value;
+        n.canal = document.getElementById('editarNegocioCanalCompleto').value;
+        n.observacoes = document.getElementById('editarNegocioObservacoesCompleto').value;
+        renderizarKanban();
+        fecharModalEditarNegocioCompleto();
+        salvarDados();
+        alert('✅ Atualizado!');
+    }
+}
+
+function excluirNegocioDireto(negocioId) {
+    const negocio = negocios.find(n => n.id === negocioId);
+    if (!negocio) return;
+    
+    if (confirm('Excluir negócio?\n\nCliente: ' + negocio.cliente + '\nValor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}))) {
+        negocios = negocios.filter(n => n.id !== negocioId);
+        renderizarKanban();
+        salvarDados();
+        alert('✅ Negócio excluído!');
+    }
+}
+
+function abrirWhatsAppDireto(telefone, cliente) {
+    if (!telefone) { alert('❌ Sem telefone!'); return; }
+    const tel = telefone.replace(/\D/g, '');
+    if (tel.length < 10) { alert('❌ Telefone inválido!'); return; }
+    const msg = encodeURIComponent('Olá ' + cliente + '! Entrando em contato sobre sua proposta.');
+    window.open('https://wa.me/55' + tel + '?text=' + msg, '_blank');
+}
+
+function abrirModalGerenciarColunas() {
+    renderizarListaColunas();
+    document.getElementById('modalGerenciarColunas').classList.remove('hidden');
+}
+
+function fecharModalGerenciarColunas() {
+    document.getElementById('modalGerenciarColunas').classList.add('hidden');
+    document.getElementById('formNovaColuna').classList.add('hidden');
+}
+
+function mostrarFormNovaColuna() { document.getElementById('formNovaColuna').classList.remove('hidden'); }
+
+function renderizarListaColunas() {
+    const lista = document.getElementById('listaColunas');
+    if (!lista) return;
+    lista.innerHTML = etapasPipeline.map((e, i) => {
+        const count = negocios.filter(n => n.etapaId === e.id).length;
+        return `
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div style="width: 40px; height: 40px; background: ${e.cor}; border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">${i+1}</div>
+                    <div>
+                        <h4 style="font-weight: 600;">${e.nome} ${e.fixo ? '🔒' : ''}</h4>
+                        <p style="font-size: 13px; color: #6b7280;">${count} negócio(s) ${e.fixo ? '• <strong style="color: #dc2626;">FIXA</strong>' : ''}</p>
+                    </div>
+                </div>
+                ${!e.fixo ? `
+                    <button onclick="excluirColunaLivre(${e.id})" class="btn" style="background: #fee2e2; color: #dc2626; padding: 8px 16px;">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                ` : `
+                    <span style="background: #dcfce7; color: #16a34a; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                        <i class="fas fa-lock"></i> Protegida
+                    </span>
+                `}
+            </div>
+        `;
+    }).join('');
+}
+
+function salvarNovaColuna(event) {
+    event.preventDefault();
+    const novaCol = {
+        id: Math.max(...etapasPipeline.map(e => e.id)) + 1,
+        nome: document.getElementById('nomeNovaColuna').value,
+        cor: document.getElementById('corNovaColuna').value,
+        fixo: false
+    };
+    etapasPipeline.push(novaCol);
+    renderizarListaColunas();
+    renderizarKanban();
+    document.getElementById('formNovaColuna').classList.add('hidden');
+    document.getElementById('nomeNovaColuna').value = '';
+    salvarDados();
+    alert('✅ Coluna adicionada!');
+}
+
+function excluirColunaLivre(etapaId) {
+    const etapa = etapasPipeline.find(e => e.id === etapaId);
+    if (!etapa) return;
+
+    if (etapa.fixo) {
+        alert('🔒 Esta coluna não pode ser excluída!\n\n"' + etapa.nome + '" é essencial para o faturamento.');
+        return;
+    }
+
+    const negociosNaColuna = negocios.filter(n => n.etapaId === etapaId);
+    
+    let msg = 'Excluir coluna "' + etapa.nome + '"?';
+    if (negociosNaColuna.length > 0) {
+        msg += '\n\n⚠️ ' + negociosNaColuna.length + ' negócio(s) será(ão) movido(s) para "Lead"';
+    }
+
+    if (confirm(msg)) {
+        if (negociosNaColuna.length > 0) {
+            const colunaLead = etapasPipeline.find(e => e.nome === 'Lead') || etapasPipeline[1];
+            negociosNaColuna.forEach(n => n.etapaId = colunaLead.id);
+        }
+
+        etapasPipeline = etapasPipeline.filter(e => e.id !== etapaId);
+        renderizarListaColunas();
+        renderizarKanban();
+        salvarDados();
+        alert('✅ Coluna excluída!');
+    }
+}
+
+// PEDIDOS AUTOMÁTICOS
+function renderizarPedidosMes() {
+    const container = document.getElementById('listaPedidosPorDia');
+    const mensagem = document.getElementById('mensagemSemPedidosEnviados');
+    if (!container || !mensagem) return;
+
+    let pedidosExibir = [...pedidosEnviadosRegistro];
+
+    const filtroMes = document.getElementById('mesPedidos').value;
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+
+    if (filtroMes === 'atual') {
+        pedidosExibir = pedidosExibir.filter(p => {
+            const data = new Date(p.dataEnvio);
+            return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+        });
+    } else if (filtroMes === 'anterior') {
+        const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+        const anoMesAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+        pedidosExibir = pedidosExibir.filter(p => {
+            const data = new Date(p.dataEnvio);
+            return data.getMonth() === mesAnterior && data.getFullYear() === anoMesAnterior;
+        });
+    }
+
+    if (pedidosExibir.length === 0) {
+        mensagem.classList.remove('hidden');
+        container.innerHTML = '';
+        atualizarEstatisticasPedidosMes([]);
+        return;
+    }
+
+    mensagem.classList.add('hidden');
+
+    const pedidosPorDia = {};
+    pedidosExibir.forEach(p => {
+        const dia = new Date(p.dataEnvio).getDate();
+        if (!pedidosPorDia[dia]) pedidosPorDia[dia] = [];
+        pedidosPorDia[dia].push(p);
+    });
+
+    const diasOrdenados = Object.keys(pedidosPorDia).sort((a, b) => b - a);
+
+    container.innerHTML = diasOrdenados.map(dia => {
+        const pedidosDoDia = pedidosPorDia[dia];
+        const totalDia = pedidosDoDia.reduce((sum, p) => sum + p.valor, 0);
+
+        return `
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="background: #f9fafb; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
+                    <h3 style="font-size: 18px; font-weight: 600;">📅 Dia ${dia}</h3>
+                    <div style="text-align: right;">
+                        <p style="font-size: 14px; color: #6b7280;">${pedidosDoDia.length} pedido(s)</p>
+                        <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${totalDia.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                    </div>
+                </div>
+                ${pedidosDoDia.map(p => `
+                    <div style="background: #fff; border: 1px solid #e5e7eb; border-left: 4px solid #ec4899; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <div>
+                                <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${p.cliente}</h4>
+                                <p style="font-size: 14px; color: #6b7280;">${p.titulo}</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                ${p.telefone ? `<button onclick="abrirWhatsAppDireto('${p.telefone}', '${p.cliente}')" class="btn" style="background: #25D366; color: white; padding: 8px 12px;"><i class="fab fa-whatsapp"></i></button>` : ''}
+                                <button onclick="abrirModalEditarPedidoRegistro(${p.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 12px;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280;">💰 Valor</p>
+                                <p style="font-size: 16px; font-weight: bold; color: #16a34a;">R$ ${p.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280;">🧾 NF</p>
+                                <p style="font-size: 14px; font-weight: 600;">${p.numeroNF || 'Não informada'}</p>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <p style="font-size: 12px; color: #6b7280;">📦 Rastreio</p>
+                                <p style="font-size: 14px; font-weight: 600; font-family: monospace;">${p.codigoRastreio || 'Não informado'}</p>
+                                ${p.codigoRastreio ? `<a href="https://www.google.com/search?q=${p.codigoRastreio}" target="_blank" style="font-size: 12px; color: #3b82f6; text-decoration: none;">Rastrear <i class="fas fa-external-link-alt"></i></a>` : ''}
+                            </div>
+                        </div>
+                        ${p.transportadora ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;"><p style="font-size: 13px; color: #6b7280;">🚚 ${p.transportadora}</p></div>` : ''}
+                        ${p.observacoes ? `<div style="margin-top: 12px; padding: 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 4px;"><p style="font-size: 13px; color: #92400e;">📝 ${p.observacoes}</p></div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }).join('');
+
+    atualizarEstatisticasPedidosMes(pedidosExibir);
+}
+
+function atualizarEstatisticasPedidosMes(pedidosExibir) {
+    const total = pedidosExibir.length;
+    const valorTotal = pedidosExibir.reduce((sum, p) => sum + p.valor, 0);
+    const ticketMedio = total > 0 ? valorTotal / total : 0;
+    const totalNFs = pedidosExibir.filter(p => p.numeroNF).length;
+
+    document.getElementById('totalPedidosMes').textContent = total;
+    document.getElementById('valorTotalPedidosMes').textContent = 'R$ ' + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('ticketMedioPedidos').textContent = 'R$ ' + ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('totalNFsMes').textContent = totalNFs;
+}
+
+function abrirModalEditarPedidoRegistro(pedidoId) {
+    const pedido = pedidosEnviadosRegistro.find(p => p.id === pedidoId);
+    if (!pedido) return;
+
+    document.getElementById('editarPedidoEnviadoId').value = pedido.id;
+    document.getElementById('pedidoEnviadoCliente').textContent = pedido.cliente;
+    document.getElementById('pedidoEnviadoValor').textContent = 'R$ ' + pedido.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    document.getElementById('pedidoEnviadoNF').value = pedido.numeroNF || '';
+    document.getElementById('pedidoEnviadoRastreio').value = pedido.codigoRastreio || '';
+    document.getElementById('pedidoEnviadoTransportadora').value = pedido.transportadora || 'Correios';
+    document.getElementById('pedidoEnviadoObs').value = pedido.observacoes || '';
+
+    document.getElementById('modalEditarPedidoEnviado').classList.remove('hidden');
+}
+
+function fecharModalEditarPedidoEnviado() {
+    document.getElementById('modalEditarPedidoEnviado').classList.add('hidden');
+}
+
+function salvarEdicaoPedidoEnviado(event) {
+    event.preventDefault();
+
+    const pedidoId = parseInt(document.getElementById('editarPedidoEnviadoId').value);
+    const pedido = pedidosEnviadosRegistro.find(p => p.id === pedidoId);
+
+    if (pedido) {
+        pedido.numeroNF = document.getElementById('pedidoEnviadoNF').value;
+        pedido.codigoRastreio = document.getElementById('pedidoEnviadoRastreio').value;
+        pedido.transportadora = document.getElementById('pedidoEnviadoTransportadora').value;
+        pedido.observacoes = document.getElementById('pedidoEnviadoObs').value;
+
+        renderizarPedidosMes();
+        fecharModalEditarPedidoEnviado();
+        salvarDados();
+        alert('✅ Pedido atualizado!');
+    }
+}
+
+// AÇÕES
+function renderizarAcoes() {
+    const g = document.getElementById('gridAcoes');
+    if (!g) return;
+    if (acoes.length === 0) {
+        g.innerHTML = '<div class="card" style="grid-column: 1/-1; text-align: center; padding: 60px; color: #6b7280;"><p>Nenhuma ação</p></div>';
+        return;
+    }
+    g.innerHTML = acoes.map(a => `
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 600;">${a.titulo}</h3>
+                <button onclick="excluirAcao(${a.id})" style="padding: 8px; background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+            </div>
+            <p style="font-weight: 600;">R$ ${a.orcamento.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+            <p style="color: #6b7280; margin-top: 4px;">${a.responsavel}</p>
+        </div>
+    `).join('');
+}
+
+function abrirModalNovaAcao() {
+    document.getElementById('novaAcaoDataInicio').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalNovaAcao').classList.remove('hidden');
+}
+
+function fecharModalNovaAcao() { document.getElementById('modalNovaAcao').classList.add('hidden'); }
+
+function salvarNovaAcao(event) {
+    event.preventDefault();
+    acoes.push({
+        id: proximoIdAcao++,
+        titulo: document.getElementById('novaAcaoTitulo').value,
+        responsavel: document.getElementById('novaAcaoResponsavel').value,
+        orcamento: parseFloat(document.getElementById('novaAcaoOrcamento').value),
+        dataInicio: document.getElementById('novaAcaoDataInicio').value,
+        dataPrevista: document.getElementById('novaAcaoDataPrevista').value
+    });
+    renderizarAcoes();
+    fecharModalNovaAcao();
+    salvarDados();
+    alert('✅ Ação criada!');
+}
+
+function excluirAcao(id) {
+    if (confirm('Excluir?')) {
+        acoes = acoes.filter(a => a.id !== id);
+        renderizarAcoes();
+        salvarDados();
+    }
+}
+
+// INICIALIZAÇÃO
+window.addEventListener('load', async function() {
+    await carregarDados();
+    atualizarDashboard();
+    renderizarCanais();
+    renderizarKanban();
+    renderizarPedidosMes();
+    renderizarAcoes();
+    atualizarDRE();
+    console.log('✅ Sistema carregado com registros permanentes!');
+});
+
+setInterval(salvarDados, 30000);
+
+setInterval(function() {
+    if (!document.getElementById('page-dashboard').classList.contains('hidden')) {
+        atualizarDashboard();
+    }
+}, 60000);
+
+</script>
+</body>
+</html>
