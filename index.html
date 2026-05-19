@@ -39,6 +39,7 @@
         .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -70,7 +71,7 @@
             <i class="fas fa-chart-line" style="width: 20px;"></i><span>Dashboard</span>
         </div>
         <div class="menu-item" onclick="irParaPagina('faturamento')">
-            <i class="fas fa-dollar-sign" style="width: 20px;"></i><span>Faturamento</span>
+            <i class="fas fa-dollar-sign" style="width: 20px;"></i><span>Canais de Venda</span>
         </div>
         <div class="menu-item" onclick="irParaPagina('dre')">
             <i class="fas fa-file-invoice" style="width: 20px;"></i><span>DRE</span>
@@ -82,7 +83,7 @@
     <i class="fas fa-address-book" style="width: 20px;"></i><span>Clientes</span>
 </div>
         <div class="menu-item" onclick="irParaPagina('pedidos')">
-            <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos</span>
+            <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos Enviados</span>
         </div>
         <div class="menu-item" onclick="irParaPagina('acoes')">
             <i class="fas fa-bullseye" style="width: 20px;"></i><span>Ações</span>
@@ -783,7 +784,7 @@ function irParaPagina(pageName) {
     document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
     
     if (pageName === 'dashboard') atualizarDashboard();
-    if (pageName === 'faturamento') renderizarCanais();
+    if (pageName === 'Canais de Venda') renderizarCanais();
     if (pageName === 'dre') atualizarDRE();
     if (pageName === 'crm') renderizarKanban();
 if (pageName === 'clientes') renderizarClientes();
@@ -1558,24 +1559,31 @@ function soltarCard(event, novaEtapaId) {
     negocio.etapaId = novaEtapaId;
 
     // VENDA FECHADA - CRIAR REGISTRO PERMANENTE
-    const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
-    if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
+const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
+if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
+    
+    const jaRegistrado = vendasFechadasRegistro.find(v => v.negocioId === negocio.id);
+    
+    if (!jaRegistrado) {
+        // CORRIGIR DATA PARA TIMEZONE LOCAL
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const dataLocal = `${ano}-${mes}-${dia}`;
         
-        const jaRegistrado = vendasFechadasRegistro.find(v => v.negocioId === negocio.id);
+        const novaVenda = {
+            id: proximoIdVenda++,
+            negocioId: negocio.id,
+            cliente: negocio.cliente,
+            titulo: negocio.titulo,
+            valor: negocio.valor,
+            canal: negocio.canal,
+            dataFechamento: dataLocal,  // ⬅️ Usa data local corrigida
+            dataHora: new Date().toISOString()
+        };
         
-        if (!jaRegistrado) {
-            const novaVenda = {
-                id: proximoIdVenda++,
-                negocioId: negocio.id,
-                cliente: negocio.cliente,
-                titulo: negocio.titulo,
-                valor: negocio.valor,
-                canal: negocio.canal,
-                dataFechamento: new Date().toISOString().split('T')[0],
-                dataHora: new Date().toISOString()
-            };
-            
-            vendasFechadasRegistro.push(novaVenda);
+        vendasFechadasRegistro.push(novaVenda);
             
             if (negocio.canal) {
                 const canal = canaisVenda.find(c => c.id === parseInt(negocio.canal));
@@ -1597,33 +1605,40 @@ function soltarCard(event, novaEtapaId) {
     }
 
     // PEDIDO ENVIADO - CRIAR REGISTRO PERMANENTE
-    const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
-    if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
+const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
+if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
+    
+    const jaRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocio.id);
+    
+    if (!jaRegistrado) {
+        // CORRIGIR DATA PARA TIMEZONE LOCAL
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const dataLocal = `${ano}-${mes}-${dia}`;
         
-        const jaRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocio.id);
+        const novoPedido = {
+            id: proximoIdPedidoEnviado++,
+            negocioId: negocio.id,
+            cliente: negocio.cliente,
+            titulo: negocio.titulo,
+            valor: negocio.valor,
+            telefone: negocio.telefone,
+            dataEnvio: dataLocal,  // ⬅️ Usa data local corrigida
+            numeroNF: '',
+            codigoRastreio: '',
+            transportadora: 'Correios',
+            observacoes: ''
+        };
         
-        if (!jaRegistrado) {
-            const novoPedido = {
-                id: proximoIdPedidoEnviado++,
-                negocioId: negocio.id,
-                cliente: negocio.cliente,
-                titulo: negocio.titulo,
-                valor: negocio.valor,
-                telefone: negocio.telefone,
-                dataEnvio: new Date().toISOString().split('T')[0],
-                numeroNF: '',
-                codigoRastreio: '',
-                transportadora: 'Correios',
-                observacoes: ''
-            };
-            
-            pedidosEnviadosRegistro.push(novoPedido);
-            
-            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + new Date().getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
-        } else {
-            alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
-        }
+        pedidosEnviadosRegistro.push(novoPedido);
+        
+        alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + hoje.getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
+    } else {
+        alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
     }
+}
 
     negocioArrastando = null;
     salvarDados();
@@ -2329,14 +2344,11 @@ function exportarClientes() {
     // Ordenar alfabeticamente
     clientes.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // Gerar CSV
-    let csv = 'LISTA DE CLIENTES\n\n';
-    csv += 'Nome;Telefone;Email;Total de Negócios;Valor Total;Ticket Médio;Última Compra;Status\n';
-
     const hoje = new Date();
     const diasInativo = 90;
 
-    clientes.forEach(c => {
+    // Preparar dados para Excel
+    const dadosExcel = clientes.map(c => {
         const qtdNegocios = c.negocios.length;
         const ticketMedio = qtdNegocios > 0 ? c.valorTotal / qtdNegocios : 0;
         
@@ -2350,20 +2362,52 @@ function exportarClientes() {
 
         const ultimaCompra = c.ultimaCompra ? new Date(c.ultimaCompra).toLocaleDateString('pt-BR') : 'Nunca';
 
-        csv += `${c.nome};${c.telefone || ''};${c.email || ''};${qtdNegocios};${c.valorTotal.toFixed(2)};${ticketMedio.toFixed(2)};${ultimaCompra};${status}\n`;
+        return {
+            'Nome': c.nome,
+            'Telefone': c.telefone || '',
+            'Email': c.email || '',
+            'Total de Negócios': qtdNegocios,
+            'Valor Total': 'R$ ' + c.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+            'Ticket Médio': 'R$ ' + ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+            'Última Compra': ultimaCompra,
+            'Status': status
+        };
     });
 
-    csv += `\nTOTAL DE CLIENTES: ${clientes.length}\n`;
-    csv += `GERADO EM: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\n`;
+    // Criar workbook e worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(dadosExcel);
 
-    // Download
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'clientes-' + new Date().toISOString().split('T')[0] + '.csv';
-    link.click();
+    // Ajustar largura das colunas
+    const wscols = [
+        {wch: 30},  // Nome
+        {wch: 20},  // Telefone
+        {wch: 30},  // Email
+        {wch: 18},  // Total Negócios
+        {wch: 20},  // Valor Total
+        {wch: 20},  // Ticket Médio
+        {wch: 18},  // Última Compra
+        {wch: 12}   // Status
+    ];
+    ws['!cols'] = wscols;
 
-    alert('✅ Lista de clientes exportada!\n\n' + clientes.length + ' cliente(s) exportado(s)');
+    // Adicionar worksheet ao workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+
+    // Adicionar uma segunda aba com resumo
+    const resumo = [
+        {Item: 'Total de Clientes', Valor: clientes.length},
+        {Item: 'Data de Exportação', Valor: new Date().toLocaleDateString('pt-BR')},
+        {Item: 'Hora de Exportação', Valor: new Date().toLocaleTimeString('pt-BR')}
+    ];
+    const wsResumo = XLSX.utils.json_to_sheet(resumo);
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+
+    // Gerar arquivo Excel e fazer download
+    const nomeArquivo = 'clientes-' + new Date().toISOString().split('T')[0] + '.xlsx';
+    XLSX.writeFile(wb, nomeArquivo);
+
+    alert('✅ Lista de clientes exportada em Excel!\n\n📊 ' + clientes.length + ' cliente(s)\n📁 Arquivo: ' + nomeArquivo + '\n\n💡 O arquivo tem 2 abas:\n• Clientes (lista completa)\n• Resumo (estatísticas)');
 }
 
 // INICIALIZAÇÃO
