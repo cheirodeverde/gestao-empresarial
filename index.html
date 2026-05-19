@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f3f4f6; }
@@ -39,10 +40,10 @@
         .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
+<!-- TELA DE LOGIN -->
 <div id="telaLogin" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; z-index: 99999;">
     <div style="background: white; border-radius: 16px; padding: 40px; max-width: 400px; width: 90%;">
         <div style="text-align: center; margin-bottom: 32px;">
@@ -59,9 +60,10 @@
             <div id="erroLogin" class="hidden" style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">❌ Senha incorreta!</div>
             <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Entrar</button>
         </form>
-       </div>
+    </div>
 </div>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
     <div style="padding: 20px; border-bottom: 1px solid #374151;">
         <h2 style="font-size: 20px; font-weight: bold;">Minha Empresa</h2>
@@ -79,9 +81,12 @@
         <div class="menu-item" onclick="irParaPagina('crm')">
             <i class="fas fa-users" style="width: 20px;"></i><span>CRM</span>
         </div>
-<div class="menu-item" onclick="irParaPagina('clientes')">
-    <i class="fas fa-address-book" style="width: 20px;"></i><span>Clientes</span>
-</div>
+        <div class="menu-item" onclick="irParaPagina('clientes')">
+            <i class="fas fa-address-book" style="width: 20px;"></i><span>Clientes</span>
+        </div>
+        <div class="menu-item" onclick="irParaPagina('transportadoras')">
+            <i class="fas fa-truck" style="width: 20px;"></i><span>Transportadoras</span>
+        </div>
         <div class="menu-item" onclick="irParaPagina('pedidos')">
             <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos Enviados</span>
         </div>
@@ -89,16 +94,17 @@
             <i class="fas fa-bullseye" style="width: 20px;"></i><span>Ações</span>
         </div>
     </nav>
-   <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
-    <div class="menu-item" onclick="irParaPagina('configuracoes')">
-        <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
+    <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
+        <div class="menu-item" onclick="irParaPagina('configuracoes')">
+            <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
+        </div>
+        <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
+            <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
+        </div>
     </div>
-    <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
-        <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
-    </div>
-</div>
 </div>
 
+<!-- HEADER -->
 <div class="main-content">
     <header style="background: white; padding: 20px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -119,8 +125,7 @@
             </div>
         </div>
     </header>
-    
-    <div style="padding: 40px;">
+<div style="padding: 40px;">
 
 <!-- DASHBOARD -->
         <div id="page-dashboard" class="page-content">
@@ -222,13 +227,13 @@
             </div>
         </div>
 
-        <!-- FATURAMENTO -->
+<!-- FATURAMENTO -->
         <div id="page-faturamento" class="page-content hidden">
             <button class="btn btn-primary" onclick="abrirModalNovoCanal()" style="margin-bottom: 24px;">+ Novo Canal</button>
             <div id="canaisContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;"></div>
         </div>
 
-        <!-- DRE -->
+<!-- DRE -->
         <div id="page-dre" class="page-content hidden">
             <button class="btn btn-primary" onclick="abrirModalNovoGasto()" style="margin-bottom: 24px;">+ Novo Gasto</button>
             <div class="card">
@@ -241,7 +246,7 @@
             </div>
         </div>
 
-        <!-- CRM -->
+<!-- CRM -->
         <div id="page-crm" class="page-content hidden">
             <div style="display: flex; gap: 8px; margin-bottom: 24px;">
                 <button class="btn" style="background: #6b7280; color: white;" onclick="abrirModalGerenciarColunas()">
@@ -251,7 +256,6 @@
             </div>
             <div id="kanbanBoard" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px;"></div>
         </div>
-
 <!-- CLIENTES -->
         <div id="page-clientes" class="page-content hidden">
             <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
@@ -261,7 +265,6 @@
                 </button>
             </div>
 
-            <!-- Estatísticas -->
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px;">
                 <div class="metric-card">
                     <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Total de Clientes</p>
@@ -285,7 +288,6 @@
                 </div>
             </div>
 
-            <!-- Busca e Filtros -->
             <div style="display: flex; gap: 12px; margin-bottom: 24px;">
                 <div style="position: relative; flex: 1;">
                     <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
@@ -299,7 +301,6 @@
                 </select>
             </div>
 
-            <!-- Lista de Clientes -->
             <div id="listaClientes"></div>
 
             <div id="mensagemSemClientes" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
@@ -309,7 +310,40 @@
             </div>
         </div>
 
-        <!-- PEDIDOS -->
+<!-- TRANSPORTADORAS -->
+        <div id="page-transportadoras" class="page-content hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <h2 style="font-size: 24px; font-weight: bold;">Transportadoras</h2>
+                <button onclick="abrirModalNovaTransportadora()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nova Transportadora
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px;">
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Total de Transportadoras</p>
+                    <p id="totalTransportadoras" style="font-size: 28px; font-weight: bold;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Transportadoras Ativas</p>
+                    <p id="transportadorasAtivas" style="font-size: 28px; font-weight: bold; color: #16a34a;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Pedidos Cadastrados</p>
+                    <p id="pedidosComTransportadora" style="font-size: 28px; font-weight: bold; color: #3b82f6;">0</p>
+                </div>
+            </div>
+
+            <div id="listaTransportadoras"></div>
+
+            <div id="mensagemSemTransportadoras" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
+                <i class="fas fa-truck" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Nenhuma transportadora cadastrada</p>
+                <p style="font-size: 14px;">Clique em "Nova Transportadora" para começar</p>
+            </div>
+        </div>
+
+<!-- PEDIDOS -->
         <div id="page-pedidos" class="page-content hidden">
             <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
                 <h2 style="font-size: 24px; font-weight: bold;">Pedidos Enviados</h2>
@@ -349,11 +383,12 @@
             </div>
         </div>
 
-        <!-- AÇÕES -->
+<!-- AÇÕES -->
         <div id="page-acoes" class="page-content hidden">
             <button class="btn btn-primary" onclick="abrirModalNovaAcao()" style="margin-bottom: 24px;">+ Nova Ação</button>
             <div id="gridAcoes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;"></div>
         </div>
+
 <!-- CONFIGURAÇÕES DA EMPRESA -->
         <div id="page-configuracoes" class="page-content hidden">
             <div style="margin-bottom: 32px;">
@@ -361,7 +396,6 @@
                 <p style="color: #6b7280;">Configure as informações da sua empresa</p>
             </div>
 
-            <!-- Resumo Visual -->
             <div id="resumoEmpresa" class="card" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; margin-bottom: 32px;">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div>
@@ -372,7 +406,6 @@
                 </div>
             </div>
 
-            <!-- Formulário de Cadastro -->
             <div class="card">
                 <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">📋 Informações Cadastrais</h3>
                 
@@ -480,7 +513,6 @@
                 </form>
             </div>
 
-            <!-- Card de Informações Salvas -->
             <div class="card" style="background: #eff6ff; border: 2px solid #3b82f6;">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <i class="fas fa-info-circle" style="font-size: 24px; color: #3b82f6;"></i>
@@ -491,9 +523,13 @@
                 </div>
             </div>
         </div>
-    
+
+    </div>
+</div>
+
 <!-- MODAIS -->
 
+<!-- Modal: Novo Canal -->
 <div id="modalNovoCanal" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Canal</h3>
@@ -526,6 +562,7 @@
     </div>
 </div>
 
+<!-- Modal: Lançar Venda -->
 <div id="modalLancarVenda" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Lançar Venda</h3>
@@ -551,6 +588,7 @@
     </div>
 </div>
 
+<!-- Modal: Novo Gasto -->
 <div id="modalNovoGasto" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Gasto</h3>
@@ -587,6 +625,7 @@
     </div>
 </div>
 
+<!-- Modal: Novo Negócio -->
 <div id="modalNovoNegocio" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Negócio</h3>
@@ -625,6 +664,7 @@
     </div>
 </div>
 
+<!-- Modal: Editar Negócio Completo -->
 <div id="modalEditarNegocioCompleto" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -671,6 +711,7 @@
     </div>
 </div>
 
+<!-- Modal: Gerenciar Colunas -->
 <div id="modalGerenciarColunas" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 700px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -701,6 +742,7 @@
     </div>
 </div>
 
+<!-- Modal: Configurar Meta -->
 <div id="modalConfigurarMeta" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">🎯 Configurar Meta</h3>
@@ -720,6 +762,7 @@
     </div>
 </div>
 
+<!-- Modal: Nova Tarefa -->
 <div id="modalNovaTarefa" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Tarefa</h3>
@@ -744,6 +787,7 @@
     </div>
 </div>
 
+<!-- Modal: Nova Ação -->
 <div id="modalNovaAcao" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Ação</h3>
@@ -776,6 +820,7 @@
     </div>
 </div>
 
+<!-- Modal: Editar Pedido Enviado -->
 <div id="modalEditarPedidoEnviado" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -801,9 +846,7 @@
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-weight: 600; margin-bottom: 8px;">Transportadora</label>
                 <select id="pedidoEnviadoTransportadora" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
-                    <option value="Correios">📮 Correios</option>
-                    <option value="Jadlog">📦 Jadlog</option>
-                    <option value="Total Express">🚚 Total Express</option>
+                    <option value="">Selecione</option>
                 </select>
             </div>
             <div style="margin-bottom: 20px;">
@@ -816,7 +859,9 @@
             </div>
         </form>
     </div>
+</div>
 
+<!-- Modal: Histórico do Cliente (✅ SEM DUPLICATA) -->
 <div id="modalHistoricoCliente" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 800px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -826,7 +871,70 @@
         <div id="dadosClienteHistorico" style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 24px;"></div>
         <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📋 Histórico de Negócios</h4>
         <div id="historicoNegociosCliente"></div>
- </div>
+    </div>
+</div>
+
+<!-- Modal: Nova/Editar Transportadora -->
+<div id="modalTransportadora" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 id="tituloModalTransportadora" style="font-size: 20px; font-weight: bold;">Nova Transportadora</h3>
+            <button type="button" onclick="fecharModalTransportadora()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+        <form onsubmit="salvarTransportadora(event)">
+            <input type="hidden" id="transportadoraId">
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">🚚 Nome da Transportadora *</label>
+                <input type="text" id="nomeTransportadora" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Correios, Jadlog, Total Express">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">📄 CNPJ</label>
+                <input type="text" id="cnpjTransportadora" maxlength="18" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="00.000.000/0000-00">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔗 Link de Rastreamento *</label>
+                <input type="url" id="linkRastreamento" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="https://exemplo.com/rastreamento?codigo=">
+                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">💡 O código será adicionado automaticamente ao final do link</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">📞 Telefone</label>
+                    <input type="tel" id="telefoneTransportadora" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 0000-0000">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">📧 Email</label>
+                    <input type="email" id="emailTransportadora" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="contato@transportadora.com">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="ativaTransportadora" checked style="width: 20px; height: 20px;">
+                    <span style="font-weight: 600;">✅ Transportadora Ativa</span>
+                </label>
+            </div>
+
+            <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="font-size: 14px; color: #1e40af;">
+                    <i class="fas fa-info-circle"></i> <strong>Como usar:</strong><br>
+                    • Cole o link base de rastreamento<br>
+                    • O código será anexado automaticamente nos pedidos<br>
+                    • Exemplo: https://rastreamento.com/codigo/<strong>CODIGO_AQUI</strong>
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="fecharModalTransportadora()" class="btn" style="background: #e5e7eb;">Cancelar</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -922,6 +1030,11 @@ let dadosEmpresa = {
     dataFundacao: '',
     observacoes: ''
 };
+
+// TRANSPORTADORAS
+let transportadoras = [];
+let proximoIdTransportadora = 1;
+
 // NAVEGAÇÃO
 function irParaPagina(pageName) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
@@ -934,17 +1047,28 @@ function irParaPagina(pageName) {
         if (menuItem) menuItem.classList.add('active');
     }
     
-    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', clientes: 'Clientes', pedidos: 'Pedidos Enviados', acoes: 'Ações', configuracoes: 'Dados da Empresa' };
+    const titles = { 
+        dashboard: 'Dashboard', 
+        faturamento: 'Faturamento', 
+        dre: 'DRE', 
+        crm: 'CRM', 
+        clientes: 'Clientes', 
+        pedidos: 'Pedidos Enviados', 
+        acoes: 'Ações', 
+        transportadoras: 'Transportadoras', 
+        configuracoes: 'Dados da Empresa' 
+    };
     document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
     
     if (pageName === 'dashboard') atualizarDashboard();
-    if (pageName === 'Canais de Venda') renderizarCanais();
+    if (pageName === 'faturamento') renderizarCanais();
     if (pageName === 'dre') atualizarDRE();
     if (pageName === 'crm') renderizarKanban();
-if (pageName === 'clientes') renderizarClientes();
+    if (pageName === 'clientes') renderizarClientes();
+    if (pageName === 'transportadoras') renderizarTransportadoras();
     if (pageName === 'pedidos') renderizarPedidosMes();
     if (pageName === 'acoes') renderizarAcoes();
-if (pageName === 'configuracoes') carregarDadosEmpresa();
+    if (pageName === 'configuracoes') carregarDadosEmpresa();
 }
 
 // SALVAR/CARREGAR
@@ -957,7 +1081,7 @@ async function salvarDados() {
             metaMensal, tarefasDia, proximoIdTarefa,
             vendasFechadasRegistro, proximoIdVenda,
             pedidosEnviadosRegistro, proximoIdPedidoEnviado,
-dadosEmpresa,
+            dadosEmpresa, transportadoras, proximoIdTransportadora,
             ultimaAtualizacao: new Date().toISOString()
         };
         
@@ -973,7 +1097,8 @@ dadosEmpresa,
                 pedidos, proximoIdPedido, acoes, proximoIdAcao,
                 metaMensal, tarefasDia, proximoIdTarefa,
                 vendasFechadasRegistro, proximoIdVenda,
-                pedidosEnviadosRegistro, proximoIdPedidoEnviado
+                pedidosEnviadosRegistro, proximoIdPedidoEnviado,
+                dadosEmpresa, transportadoras, proximoIdTransportadora,
             };
             localStorage.setItem('sistemaGestao', JSON.stringify(dados));
             console.log('💾 Salvo localmente');
@@ -1006,7 +1131,9 @@ async function carregarDados() {
             proximoIdVenda = dados.proximoIdVenda || 1;
             pedidosEnviadosRegistro = dados.pedidosEnviadosRegistro || [];
             proximoIdPedidoEnviado = dados.proximoIdPedidoEnviado || 1;
-dadosEmpresa = dados.dadosEmpresa || dadosEmpresa;
+            dadosEmpresa = dados.dadosEmpresa || dadosEmpresa;
+            transportadoras = dados.transportadoras || [];
+            proximoIdTransportadora = dados.proximoIdTransportadora || 1;
             
             console.log('☁️ Carregado do Firebase!');
             localStorage.setItem('sistemaGestao', JSON.stringify(dados));
@@ -1042,7 +1169,9 @@ function carregarDadosLocal() {
             proximoIdVenda = p.proximoIdVenda || 1;
             pedidosEnviadosRegistro = p.pedidosEnviadosRegistro || [];
             proximoIdPedidoEnviado = p.proximoIdPedidoEnviado || 1;
-dadosEmpresa = p.dadosEmpresa || dadosEmpresa;
+            dadosEmpresa = p.dadosEmpresa || dadosEmpresa;
+            transportadoras = p.transportadoras || [];
+            proximoIdTransportadora = p.proximoIdTransportadora || 1;
             
             console.log('💾 Carregado localmente!');
         }
@@ -1060,7 +1189,8 @@ function exportarBackup() {
             pedidos, proximoIdPedido, acoes, proximoIdAcao,
             metaMensal, tarefasDia, proximoIdTarefa,
             vendasFechadasRegistro, proximoIdVenda,
-            pedidosEnviadosRegistro, proximoIdPedidoEnviado
+            pedidosEnviadosRegistro, proximoIdPedidoEnviado,
+            dadosEmpresa, transportadoras, proximoIdTransportadora
         }
     };
     
@@ -1108,6 +1238,9 @@ function importarBackup() {
                 proximoIdVenda = d.proximoIdVenda || 1;
                 pedidosEnviadosRegistro = d.pedidosEnviadosRegistro || [];
                 proximoIdPedidoEnviado = d.proximoIdPedidoEnviado || 1;
+                dadosEmpresa = d.dadosEmpresa || dadosEmpresa;
+                transportadoras = d.transportadoras || [];
+                proximoIdTransportadora = d.proximoIdTransportadora || 1;
                 
                 salvarDados();
                 location.reload();
@@ -1126,7 +1259,6 @@ function atualizarDashboard() {
     const mesAtual = hoje.getMonth();
     const anoAtual = hoje.getFullYear();
     
-    // USAR REGISTROS PERMANENTES
     const vendasMesAtual = vendasFechadasRegistro.filter(v => {
         const data = new Date(v.dataFechamento);
         return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
@@ -1201,7 +1333,6 @@ function renderizarGraficoFaturamento() {
         data.setMonth(data.getMonth() - i);
         meses.push(data.toLocaleDateString('pt-BR', { month: 'short' }));
 
-        // USAR REGISTROS PERMANENTES
         const vendasMes = vendasFechadasRegistro.filter(v => {
             const dataV = new Date(v.dataFechamento);
             return dataV.getMonth() === data.getMonth() && dataV.getFullYear() === data.getFullYear();
@@ -1314,7 +1445,6 @@ function renderizarResumoExecutivo() {
     const inicioSemana = new Date();
     inicioSemana.setDate(inicioSemana.getDate() - 7);
 
-    // USAR REGISTROS PERMANENTES
     const vendasSemana = vendasFechadasRegistro.filter(v => new Date(v.dataFechamento) >= inicioSemana);
     const faturamentoSemana = vendasSemana.reduce((sum, v) => sum + v.valor, 0);
     const novosNegocios = negocios.filter(n => new Date(n.dataCriacao) >= inicioSemana);
@@ -1346,7 +1476,6 @@ function renderizarTopClientes() {
     const container = document.getElementById('topClientes');
     if (!container) return;
 
-    // USAR REGISTROS PERMANENTES
     if (vendasFechadasRegistro.length === 0) {
         container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">Nenhuma venda</p>';
         return;
@@ -1388,7 +1517,6 @@ function verificarAlertasMeta() {
 
     const hoje = new Date();
     
-    // USAR REGISTROS PERMANENTES
     const vendasMesAtual = vendasFechadasRegistro.filter(v => {
         const data = new Date(v.dataFechamento);
         return data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
@@ -1521,23 +1649,29 @@ function renderizarCanais() {
             <div class="metric-card">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
                     <div style="width: 48px; height: 48px; background: ${canal.cor}20; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas $${canal.icone}" style="color: $${canal.cor}; font-size: 20px;"></i>
+                        <i class="fas ${canal.icone}" style="color: ${canal.cor}; font-size: 20px;"></i>
                     </div>
                     <div style="display: flex; gap: 4px;">
-                        <button onclick="abrirModalLancarVenda($${canal.id})" style="padding: 6px 10px; background: $${canal.cor}; color: white; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-plus"></i></button>
+                        <button onclick="abrirModalLancarVenda(${canal.id})" style="padding: 6px 10px; background: ${canal.cor}; color: white; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-plus"></i></button>
                         <button onclick="excluirCanal(${canal.id})" style="padding: 6px 10px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">${canal.nome}</h3>
-                <p style="font-size: 28px; font-weight: bold; color: $${canal.cor}">R$$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 28px; font-weight: bold; color: ${canal.cor}">R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                 <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">${vendas.length} vendas</p>
             </div>
         `;
     }).join('');
 }
 
-function abrirModalNovoCanal() { document.getElementById('modalNovoCanal').classList.remove('hidden'); }
-function fecharModalNovoCanal() { document.getElementById('modalNovoCanal').classList.add('hidden'); }
+function abrirModalNovoCanal() { 
+    document.getElementById('modalNovoCanal').classList.remove('hidden'); 
+}
+
+function fecharModalNovoCanal() { 
+    document.getElementById('modalNovoCanal').classList.add('hidden'); 
+}
+
 function salvarNovoCanal(event) {
     event.preventDefault();
     canaisVenda.push({
@@ -1569,7 +1703,10 @@ function abrirModalLancarVenda(canalId) {
     document.getElementById('modalLancarVenda').classList.remove('hidden');
 }
 
-function fecharModalLancarVenda() { document.getElementById('modalLancarVenda').classList.add('hidden'); }
+function fecharModalLancarVenda() { 
+    document.getElementById('modalLancarVenda').classList.add('hidden'); 
+}
+
 function salvarVenda(event) {
     event.preventDefault();
     const canalId = parseInt(document.getElementById('vendaCanalId').value);
@@ -1591,7 +1728,6 @@ function salvarVenda(event) {
 
 // DRE
 function atualizarDRE() {
-    // USAR REGISTROS PERMANENTES
     const vendasFechadas = vendasFechadasRegistro;
     
     const lr = document.getElementById('listaReceitasDRE');
@@ -1603,7 +1739,7 @@ function atualizarDRE() {
                 <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb;">
                     <div>
                         <p style="font-weight: 600;">${v.cliente}</p>
-                        <p style="font-size: 14px; color: #6b7280;">$${v.titulo} - $${new Date(v.dataFechamento).toLocaleDateString('pt-BR')}</p>
+                        <p style="font-size: 14px; color: #6b7280;">${v.titulo} - ${new Date(v.dataFechamento).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <p style="font-weight: 600; color: #16a34a;">R$ ${v.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                 </div>
@@ -1618,7 +1754,10 @@ function atualizarDRE() {
         } else {
             ld.innerHTML = gastos.map(g => `
                 <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb; align-items: center;">
-                    <div><p style="font-weight: 600;">${g.categoria}</p><p style="font-size: 14px; color: #6b7280;">${g.descricao}</p></div>
+                    <div>
+                        <p style="font-weight: 600;">${g.categoria}</p>
+                        <p style="font-size: 14px; color: #6b7280;">${g.descricao}</p>
+                    </div>
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <p style="font-weight: 600; color: #dc2626;">R$ ${g.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                         <button onclick="excluirGasto(${g.id})" style="padding: 6px 10px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; cursor: pointer;"><i class="fas fa-trash"></i></button>
@@ -1634,7 +1773,10 @@ function abrirModalNovoGasto() {
     document.getElementById('modalNovoGasto').classList.remove('hidden');
 }
 
-function fecharModalNovoGasto() { document.getElementById('modalNovoGasto').classList.add('hidden'); }
+function fecharModalNovoGasto() { 
+    document.getElementById('modalNovoGasto').classList.add('hidden'); 
+}
+
 function salvarNovoGasto(event) {
     event.preventDefault();
     gastos.push({
@@ -1703,8 +1845,13 @@ function renderizarKanban() {
     });
 }
 
-function iniciarArrasto(negocioId) { negocioArrastando = negocioId; }
-function permitirSoltar(event) { event.preventDefault(); }
+function iniciarArrasto(negocioId) { 
+    negocioArrastando = negocioId; 
+}
+
+function permitirSoltar(event) { 
+    event.preventDefault(); 
+}
 
 function soltarCard(event, novaEtapaId) {
     event.preventDefault();
@@ -1717,32 +1864,31 @@ function soltarCard(event, novaEtapaId) {
     negocio.etapaId = novaEtapaId;
 
     // VENDA FECHADA - CRIAR REGISTRO PERMANENTE
-const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
-if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
-    
-    const jaRegistrado = vendasFechadasRegistro.find(v => v.negocioId === negocio.id);
-    
-    if (!jaRegistrado) {
-        // CORRIGIR DATA PARA TIMEZONE LOCAL
-        const hoje = new Date();
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const dataLocal = `${ano}-${mes}-${dia}`;
+    const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
+    if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
         
-        const novaVenda = {
-            id: proximoIdVenda++,
-            negocioId: negocio.id,
-            cliente: negocio.cliente,
-            titulo: negocio.titulo,
-            valor: negocio.valor,
-            canal: negocio.canal,
-            dataFechamento: dataLocal,  // ⬅️ Usa data local corrigida
-            dataHora: new Date().toISOString()
-        };
+        const jaRegistrado = vendasFechadasRegistro.find(v => v.negocioId === negocio.id);
         
-        vendasFechadasRegistro.push(novaVenda);
+        if (!jaRegistrado) {
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const dataLocal = `${ano}-${mes}-${dia}`;
             
+            const novaVenda = {
+                id: proximoIdVenda++,
+                negocioId: negocio.id,
+                cliente: negocio.cliente,
+                titulo: negocio.titulo,
+                valor: negocio.valor,
+                canal: negocio.canal,
+                dataFechamento: dataLocal,
+                dataHora: new Date().toISOString()
+            };
+            
+            vendasFechadasRegistro.push(novaVenda);
+                
             if (negocio.canal) {
                 const canal = canaisVenda.find(c => c.id === parseInt(negocio.canal));
                 if (canal) {
@@ -1763,40 +1909,39 @@ if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
     }
 
     // PEDIDO ENVIADO - CRIAR REGISTRO PERMANENTE
-const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
-if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
-    
-    const jaRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocio.id);
-    
-    if (!jaRegistrado) {
-        // CORRIGIR DATA PARA TIMEZONE LOCAL
-        const hoje = new Date();
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const dataLocal = `${ano}-${mes}-${dia}`;
+    const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
+    if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
         
-        const novoPedido = {
-            id: proximoIdPedidoEnviado++,
-            negocioId: negocio.id,
-            cliente: negocio.cliente,
-            titulo: negocio.titulo,
-            valor: negocio.valor,
-            telefone: negocio.telefone,
-            dataEnvio: dataLocal,  // ⬅️ Usa data local corrigida
-            numeroNF: '',
-            codigoRastreio: '',
-            transportadora: 'Correios',
-            observacoes: ''
-        };
+        const jaRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocio.id);
         
-        pedidosEnviadosRegistro.push(novoPedido);
-        
-        alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + hoje.getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
-    } else {
-        alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
+        if (!jaRegistrado) {
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const dataLocal = `${ano}-${mes}-${dia}`;
+            
+            const novoPedido = {
+                id: proximoIdPedidoEnviado++,
+                negocioId: negocio.id,
+                cliente: negocio.cliente,
+                titulo: negocio.titulo,
+                valor: negocio.valor,
+                telefone: negocio.telefone,
+                dataEnvio: dataLocal,
+                numeroNF: '',
+                codigoRastreio: '',
+                transportadoraId: null,
+                observacoes: ''
+            };
+            
+            pedidosEnviadosRegistro.push(novoPedido);
+            
+            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + hoje.getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
+        } else {
+            alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
+        }
     }
-}
 
     negocioArrastando = null;
     salvarDados();
@@ -1813,12 +1958,13 @@ function abrirModalNovoNegocio() {
     document.getElementById('modalNovoNegocio').classList.remove('hidden');
 }
 
-function fecharModalNovoNegocio() { document.getElementById('modalNovoNegocio').classList.add('hidden'); }
+function fecharModalNovoNegocio() { 
+    document.getElementById('modalNovoNegocio').classList.add('hidden'); 
+}
 
 function salvarNovoNegocio(event) {
     event.preventDefault();
     
-    // Sempre começa na PRIMEIRA coluna (Lead)
     const primeiraColuna = etapasPipeline[0];
     
     negocios.push({
@@ -1830,14 +1976,13 @@ function salvarNovoNegocio(event) {
         email: document.getElementById('negocioEmail').value || '',
         canal: document.getElementById('negocioCanal').value,
         observacoes: '',
-        etapaId: primeiraColuna.id,  // Sempre primeira coluna
+        etapaId: primeiraColuna.id,
         dataCriacao: new Date().toISOString()
     });
     
     renderizarKanban();
     fecharModalNovoNegocio();
     
-    // LIMPAR FORMULÁRIO
     document.getElementById('negocioCliente').value = '';
     document.getElementById('negocioTitulo').value = '';
     document.getElementById('negocioValor').value = '';
@@ -1848,6 +1993,7 @@ function salvarNovoNegocio(event) {
     salvarDados();
     alert('✅ Negócio criado em "Lead"!');
 }
+
 function abrirModalEditarNegocioCompleto(negocioId) {
     const n = negocios.find(x => x.id === negocioId);
     if (!n) return;
@@ -1868,7 +2014,9 @@ function abrirModalEditarNegocioCompleto(negocioId) {
     document.getElementById('modalEditarNegocioCompleto').classList.remove('hidden');
 }
 
-function fecharModalEditarNegocioCompleto() { document.getElementById('modalEditarNegocioCompleto').classList.add('hidden'); }
+function fecharModalEditarNegocioCompleto() { 
+    document.getElementById('modalEditarNegocioCompleto').classList.add('hidden'); 
+}
 
 function salvarEdicaoNegocioCompleto(event) {
     event.preventDefault();
@@ -1919,7 +2067,9 @@ function fecharModalGerenciarColunas() {
     document.getElementById('formNovaColuna').classList.add('hidden');
 }
 
-function mostrarFormNovaColuna() { document.getElementById('formNovaColuna').classList.remove('hidden'); }
+function mostrarFormNovaColuna() { 
+    document.getElementById('formNovaColuna').classList.remove('hidden'); 
+}
 
 function renderizarListaColunas() {
     const lista = document.getElementById('listaColunas');
@@ -1984,7 +2134,7 @@ function excluirColunaLivre(etapaId) {
 
     if (confirm(msg)) {
         if (negociosNaColuna.length > 0) {
-            const colunaLead = etapasPipeline.find(e => e.nome === 'Lead') || etapasPipeline[1];
+            const colunaLead = etapasPipeline.find(e => e.nome === 'Lead') || etapasPipeline[0];
             negociosNaColuna.forEach(n => n.etapaId = colunaLead.id);
         }
 
@@ -1996,7 +2146,25 @@ function excluirColunaLivre(etapaId) {
     }
 }
 
-// PEDIDOS AUTOMÁTICOS
+// FUNÇÕES AUXILIARES PARA TRANSPORTADORAS
+function obterLinkRastreamento(pedido) {
+    if (!pedido.codigoRastreio) return '#';
+    if (!pedido.transportadoraId) return 'https://www.google.com/search?q=' + pedido.codigoRastreio;
+    
+    const transp = transportadoras.find(t => t.id === pedido.transportadoraId);
+    if (transp && transp.linkRastreamento) {
+        return transp.linkRastreamento + pedido.codigoRastreio;
+    }
+    return 'https://www.google.com/search?q=' + pedido.codigoRastreio;
+}
+
+function obterNomeTransportadora(pedido) {
+    if (!pedido.transportadoraId) return '';
+    const transp = transportadoras.find(t => t.id === pedido.transportadoraId);
+    return transp ? transp.nome : '';
+}
+
+// PEDIDOS
 function renderizarPedidosMes() {
     const container = document.getElementById('listaPedidosPorDia');
     const mensagem = document.getElementById('mensagemSemPedidosEnviados');
@@ -2045,6 +2213,45 @@ function renderizarPedidosMes() {
         const pedidosDoDia = pedidosPorDia[dia];
         const totalDia = pedidosDoDia.reduce((sum, p) => sum + p.valor, 0);
 
+        const pedidosHTML = pedidosDoDia.map(p => {
+            const transpNome = obterNomeTransportadora(p);
+            const linkRastreio = obterLinkRastreamento(p);
+            
+            return `
+                <div style="background: #fff; border: 1px solid #e5e7eb; border-left: 4px solid #ec4899; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <div>
+                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${p.cliente}</h4>
+                            <p style="font-size: 14px; color: #6b7280;">${p.titulo}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            ${p.telefone ? `<button onclick="abrirWhatsAppDireto('${p.telefone}', '${p.cliente}')" class="btn" style="background: #25D366; color: white; padding: 8px 12px;"><i class="fab fa-whatsapp"></i></button>` : ''}
+                            <button onclick="abrirModalEditarPedidoRegistro(${p.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 12px;">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                        <div>
+                            <p style="font-size: 12px; color: #6b7280;">💰 Valor</p>
+                            <p style="font-size: 16px; font-weight: bold; color: #16a34a;">R$ ${p.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 12px; color: #6b7280;">🧾 NF</p>
+                            <p style="font-size: 14px; font-weight: 600;">${p.numeroNF || 'Não informada'}</p>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <p style="font-size: 12px; color: #6b7280;">📦 Rastreio</p>
+                            <p style="font-size: 14px; font-weight: 600; font-family: monospace;">${p.codigoRastreio || 'Não informado'}</p>
+                            ${p.codigoRastreio && p.transportadoraId ? `<a href="${linkRastreio}" target="_blank" style="font-size: 12px; color: #3b82f6; text-decoration: none;">Rastrear 🚚 <i class="fas fa-external-link-alt"></i></a>` : ''}
+                        </div>
+                    </div>
+                    ${transpNome ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;"><p style="font-size: 13px; color: #6b7280;">🚚 Transportadora: <strong>${transpNome}</strong></p></div>` : ''}
+                    ${p.observacoes ? `<div style="margin-top: 12px; padding: 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 4px;"><p style="font-size: 13px; color: #92400e;">📝 ${p.observacoes}</p></div>` : ''}
+                </div>
+            `;
+        }).join('');
+
         return `
             <div class="card" style="margin-bottom: 20px;">
                 <div style="background: #f9fafb; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
@@ -2054,39 +2261,7 @@ function renderizarPedidosMes() {
                         <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${totalDia.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
                 </div>
-                ${pedidosDoDia.map(p => `
-                    <div style="background: #fff; border: 1px solid #e5e7eb; border-left: 4px solid #ec4899; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <div>
-                                <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${p.cliente}</h4>
-                                <p style="font-size: 14px; color: #6b7280;">${p.titulo}</p>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                ${p.telefone ? `<button onclick="abrirWhatsAppDireto('${p.telefone}', '${p.cliente}')" class="btn" style="background: #25D366; color: white; padding: 8px 12px;"><i class="fab fa-whatsapp"></i></button>` : ''}
-                                <button onclick="abrirModalEditarPedidoRegistro(${p.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 12px;">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
-                            <div>
-                                <p style="font-size: 12px; color: #6b7280;">💰 Valor</p>
-                                <p style="font-size: 16px; font-weight: bold; color: #16a34a;">R$ ${p.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                            </div>
-                            <div>
-                                <p style="font-size: 12px; color: #6b7280;">🧾 NF</p>
-                                <p style="font-size: 14px; font-weight: 600;">${p.numeroNF || 'Não informada'}</p>
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <p style="font-size: 12px; color: #6b7280;">📦 Rastreio</p>
-                                <p style="font-size: 14px; font-weight: 600; font-family: monospace;">${p.codigoRastreio || 'Não informado'}</p>
-                                ${p.codigoRastreio ? `<a href="https://www.google.com/search?q=${p.codigoRastreio}" target="_blank" style="font-size: 12px; color: #3b82f6; text-decoration: none;">Rastrear <i class="fas fa-external-link-alt"></i></a>` : ''}
-                            </div>
-                        </div>
-                        ${p.transportadora ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;"><p style="font-size: 13px; color: #6b7280;">🚚 ${p.transportadora}</p></div>` : ''}
-                        ${p.observacoes ? `<div style="margin-top: 12px; padding: 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 4px;"><p style="font-size: 13px; color: #92400e;">📝 ${p.observacoes}</p></div>` : ''}
-                    </div>
-                `).join('')}
+                ${pedidosHTML}
             </div>
         `;
     }).join('');
@@ -2115,8 +2290,15 @@ function abrirModalEditarPedidoRegistro(pedidoId) {
     document.getElementById('pedidoEnviadoValor').textContent = 'R$ ' + pedido.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     document.getElementById('pedidoEnviadoNF').value = pedido.numeroNF || '';
     document.getElementById('pedidoEnviadoRastreio').value = pedido.codigoRastreio || '';
-    document.getElementById('pedidoEnviadoTransportadora').value = pedido.transportadora || 'Correios';
     document.getElementById('pedidoEnviadoObs').value = pedido.observacoes || '';
+
+    // ✅ CORRIGIDO: Carregar transportadoras ativas
+    const selectTransp = document.getElementById('pedidoEnviadoTransportadora');
+    selectTransp.innerHTML = '<option value="">Selecione</option>';
+    transportadoras.filter(t => t.ativa).forEach(t => {
+        selectTransp.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
+    });
+    selectTransp.value = pedido.transportadoraId || '';
 
     document.getElementById('modalEditarPedidoEnviado').classList.remove('hidden');
 }
@@ -2134,7 +2316,7 @@ function salvarEdicaoPedidoEnviado(event) {
     if (pedido) {
         pedido.numeroNF = document.getElementById('pedidoEnviadoNF').value;
         pedido.codigoRastreio = document.getElementById('pedidoEnviadoRastreio').value;
-        pedido.transportadora = document.getElementById('pedidoEnviadoTransportadora').value;
+        pedido.transportadoraId = parseInt(document.getElementById('pedidoEnviadoTransportadora').value) || null;
         pedido.observacoes = document.getElementById('pedidoEnviadoObs').value;
 
         renderizarPedidosMes();
@@ -2156,7 +2338,7 @@ function renderizarAcoes() {
         <div class="card">
             <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
                 <h3 style="font-size: 18px; font-weight: 600;">${a.titulo}</h3>
-                <button onclick="excluirAcao(${a.id})" style="padding: 8px; background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                <button onclick="excluirAcao(${a.id})" style="padding: 8px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px;">🗑️</button>
             </div>
             <p style="font-weight: 600;">R$ ${a.orcamento.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
             <p style="color: #6b7280; margin-top: 4px;">${a.responsavel}</p>
@@ -2169,7 +2351,9 @@ function abrirModalNovaAcao() {
     document.getElementById('modalNovaAcao').classList.remove('hidden');
 }
 
-function fecharModalNovaAcao() { document.getElementById('modalNovaAcao').classList.add('hidden'); }
+function fecharModalNovaAcao() { 
+    document.getElementById('modalNovaAcao').classList.add('hidden'); 
+}
 
 function salvarNovaAcao(event) {
     event.preventDefault();
@@ -2195,14 +2379,10 @@ function excluirAcao(id) {
     }
 }
 
-// ==========================================
 // PÁGINA DE CLIENTES
-// ==========================================
-
 function gerarListaClientes() {
     const clientesMap = {};
 
-    // Percorrer todos os negócios e agrupar por cliente
     negocios.forEach(negocio => {
         const nomeCliente = negocio.cliente;
         
@@ -2229,7 +2409,6 @@ function gerarListaClientes() {
 
         clientesMap[nomeCliente].valorTotal += negocio.valor;
 
-        // Atualizar última compra
         const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
         if (negocio.etapaId === etapaFechada?.id && negocio.dataFechamento) {
             const dataCompra = new Date(negocio.dataFechamento);
@@ -2238,7 +2417,6 @@ function gerarListaClientes() {
             }
         }
 
-        // Atualizar telefone/email se estiver vazio
         if (!clientesMap[nomeCliente].telefone && negocio.telefone) {
             clientesMap[nomeCliente].telefone = negocio.telefone;
         }
@@ -2257,11 +2435,9 @@ function renderizarClientes() {
 
     let clientes = gerarListaClientes();
 
-    // Filtros
     const busca = document.getElementById('buscaCliente')?.value.toLowerCase() || '';
     const filtroStatus = document.getElementById('filtroStatusCliente')?.value || 'todos';
 
-    // Aplicar busca
     if (busca) {
         clientes = clientes.filter(c => 
             c.nome.toLowerCase().includes(busca) ||
@@ -2270,9 +2446,8 @@ function renderizarClientes() {
         );
     }
 
-    // Aplicar filtro de status
     const hoje = new Date();
-    const diasInativo = 90; // Cliente inativo se não comprou em 90 dias
+    const diasInativo = 90;
 
     if (filtroStatus === 'ativos') {
         clientes = clientes.filter(c => {
@@ -2290,7 +2465,6 @@ function renderizarClientes() {
         clientes = clientes.filter(c => c.negocios.length >= 3);
     }
 
-    // Ordenar alfabeticamente
     clientes.sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (clientes.length === 0) {
@@ -2306,7 +2480,6 @@ function renderizarClientes() {
         const qtdNegocios = cliente.negocios.length;
         const ticketMedio = qtdNegocios > 0 ? cliente.valorTotal / qtdNegocios : 0;
         
-        // Verificar se é ativo
         let statusCliente = 'inativo';
         let corStatus = '#6b7280';
         let labelStatus = 'Inativo';
@@ -2455,7 +2628,6 @@ function abrirModalHistoricoCliente(nomeCliente) {
         </div>
     `;
 
-    // Ordenar negócios por data (mais recente primeiro)
     const negociosOrdenados = [...cliente.negocios].sort((a, b) => new Date(b.data) - new Date(a.data));
 
     const historicoContainer = document.getElementById('historicoNegociosCliente');
@@ -2499,13 +2671,11 @@ function exportarClientes() {
         return;
     }
 
-    // Ordenar alfabeticamente
     clientes.sort((a, b) => a.nome.localeCompare(b.nome));
 
     const hoje = new Date();
     const diasInativo = 90;
 
-    // Preparar dados para Excel
     const dadosExcel = clientes.map(c => {
         const qtdNegocios = c.negocios.length;
         const ticketMedio = qtdNegocios > 0 ? c.valorTotal / qtdNegocios : 0;
@@ -2532,27 +2702,17 @@ function exportarClientes() {
         };
     });
 
-    // Criar workbook e worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(dadosExcel);
 
-    // Ajustar largura das colunas
     const wscols = [
-        {wch: 30},  // Nome
-        {wch: 20},  // Telefone
-        {wch: 30},  // Email
-        {wch: 18},  // Total Negócios
-        {wch: 20},  // Valor Total
-        {wch: 20},  // Ticket Médio
-        {wch: 18},  // Última Compra
-        {wch: 12}   // Status
+        {wch: 30}, {wch: 20}, {wch: 30}, {wch: 18},
+        {wch: 20}, {wch: 20}, {wch: 18}, {wch: 12}
     ];
     ws['!cols'] = wscols;
 
-    // Adicionar worksheet ao workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
 
-    // Adicionar uma segunda aba com resumo
     const resumo = [
         {Item: 'Total de Clientes', Valor: clientes.length},
         {Item: 'Data de Exportação', Valor: new Date().toLocaleDateString('pt-BR')},
@@ -2561,17 +2721,13 @@ function exportarClientes() {
     const wsResumo = XLSX.utils.json_to_sheet(resumo);
     XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
 
-    // Gerar arquivo Excel e fazer download
     const nomeArquivo = 'clientes-' + new Date().toISOString().split('T')[0] + '.xlsx';
     XLSX.writeFile(wb, nomeArquivo);
 
-    alert('✅ Lista de clientes exportada em Excel!\n\n📊 ' + clientes.length + ' cliente(s)\n📁 Arquivo: ' + nomeArquivo + '\n\n💡 O arquivo tem 2 abas:\n• Clientes (lista completa)\n• Resumo (estatísticas)');
+    alert('✅ Lista de clientes exportada em Excel!\n\n📊 ' + clientes.length + ' cliente(s)\n📁 Arquivo: ' + nomeArquivo);
 }
 
-// ==========================================
 // CONFIGURAÇÕES DA EMPRESA
-// ==========================================
-
 function carregarDadosEmpresa() {
     document.getElementById('nomeEmpresa').value = dadosEmpresa.nome || '';
     document.getElementById('cnpjEmpresa').value = dadosEmpresa.cnpj || '';
@@ -2627,7 +2783,6 @@ function atualizarResumoEmpresa() {
     document.getElementById('nomeEmpresaResumo').textContent = nomeExibir;
     document.getElementById('cnpjEmpresaResumo').textContent = cnpjExibir;
 
-    // Atualizar também o nome na sidebar
     const logoText = document.querySelector('.sidebar h2');
     if (logoText && dadosEmpresa.nome) {
         logoText.textContent = dadosEmpresa.nome;
@@ -2655,6 +2810,175 @@ function limparFormularioEmpresa() {
     }
 }
 
+// TRANSPORTADORAS
+function renderizarTransportadoras() {
+    const container = document.getElementById('listaTransportadoras');
+    const mensagem = document.getElementById('mensagemSemTransportadoras');
+    if (!container || !mensagem) return;
+
+    if (transportadoras.length === 0) {
+        container.innerHTML = '';
+        mensagem.classList.remove('hidden');
+        atualizarEstatisticasTransportadoras();
+        return;
+    }
+
+    mensagem.classList.add('hidden');
+
+    container.innerHTML = transportadoras.map(t => {
+        const pedidosUsando = pedidosEnviadosRegistro.filter(p => p.transportadoraId === t.id).length;
+        const statusCor = t.ativa ? '#16a34a' : '#6b7280';
+        const statusLabel = t.ativa ? 'Ativa' : 'Inativa';
+
+        return `
+            <div class="card" style="margin-bottom: 16px; border-left: 4px solid ${statusCor};">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 56px; height: 56px; border-radius: 50%; background: ${statusCor}20; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-truck" style="font-size: 24px; color: ${statusCor};"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 18px; font-weight: 600;">${t.nome}</h3>
+                                    <span style="background: ${statusCor}20; color: ${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${statusLabel}
+                                    </span>
+                                </div>
+                                <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
+                                    ${t.telefone ? `<span><i class="fas fa-phone"></i> ${t.telefone}</span>` : ''}
+                                    ${t.email ? `<span><i class="fas fa-envelope"></i> ${t.email}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🔗 Link de Rastreamento:</p>
+                            <p style="font-size: 14px; font-family: monospace; word-break: break-all;">${t.linkRastreamento}</p>
+                        </div>
+
+                        ${t.cnpj ? `
+                            <div style="font-size: 14px; color: #6b7280;">
+                                <i class="fas fa-file-alt"></i> CNPJ: ${t.cnpj}
+                            </div>
+                        ` : ''}
+
+                        <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-top: 12px;">
+                            <p style="font-size: 14px; color: #1e40af;">
+                                📦 <strong>${pedidosUsando}</strong> pedido(s) usando esta transportadora
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
+                        <button onclick="abrirModalEditarTransportadora(${t.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="excluirTransportadora(${t.id})" class="btn" style="background: #dc2626; color: white; padding: 8px 16px;">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    atualizarEstatisticasTransportadoras();
+}
+
+function atualizarEstatisticasTransportadoras() {
+    const total = transportadoras.length;
+    const ativas = transportadoras.filter(t => t.ativa).length;
+    const pedidosComTransp = pedidosEnviadosRegistro.filter(p => p.transportadoraId).length;
+
+    document.getElementById('totalTransportadoras').textContent = total;
+    document.getElementById('transportadorasAtivas').textContent = ativas;
+    document.getElementById('pedidosComTransportadora').textContent = pedidosComTransp;
+}
+
+function abrirModalNovaTransportadora() {
+    document.getElementById('tituloModalTransportadora').textContent = 'Nova Transportadora';
+    document.getElementById('transportadoraId').value = '';
+    document.getElementById('nomeTransportadora').value = '';
+    document.getElementById('cnpjTransportadora').value = '';
+    document.getElementById('linkRastreamento').value = '';
+    document.getElementById('telefoneTransportadora').value = '';
+    document.getElementById('emailTransportadora').value = '';
+    document.getElementById('ativaTransportadora').checked = true;
+    document.getElementById('modalTransportadora').classList.remove('hidden');
+}
+
+function abrirModalEditarTransportadora(id) {
+    const t = transportadoras.find(x => x.id === id);
+    if (!t) return;
+
+    document.getElementById('tituloModalTransportadora').textContent = 'Editar Transportadora';
+    document.getElementById('transportadoraId').value = t.id;
+    document.getElementById('nomeTransportadora').value = t.nome;
+    document.getElementById('cnpjTransportadora').value = t.cnpj || '';
+    document.getElementById('linkRastreamento').value = t.linkRastreamento;
+    document.getElementById('telefoneTransportadora').value = t.telefone || '';
+    document.getElementById('emailTransportadora').value = t.email || '';
+    document.getElementById('ativaTransportadora').checked = t.ativa;
+    document.getElementById('modalTransportadora').classList.remove('hidden');
+}
+
+function fecharModalTransportadora() {
+    document.getElementById('modalTransportadora').classList.add('hidden');
+}
+
+function salvarTransportadora(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('transportadoraId').value;
+    const dados = {
+        nome: document.getElementById('nomeTransportadora').value,
+        cnpj: document.getElementById('cnpjTransportadora').value,
+        linkRastreamento: document.getElementById('linkRastreamento').value,
+        telefone: document.getElementById('telefoneTransportadora').value,
+        email: document.getElementById('emailTransportadora').value,
+        ativa: document.getElementById('ativaTransportadora').checked
+    };
+
+    if (id) {
+        const t = transportadoras.find(x => x.id === parseInt(id));
+        if (t) {
+            Object.assign(t, dados);
+            alert('✅ Transportadora atualizada!');
+        }
+    } else {
+        transportadoras.push({
+            id: proximoIdTransportadora++,
+            ...dados,
+            dataCadastro: new Date().toISOString()
+        });
+        alert('✅ Transportadora cadastrada!');
+    }
+
+    renderizarTransportadoras();
+    fecharModalTransportadora();
+    salvarDados();
+}
+
+function excluirTransportadora(id) {
+    const t = transportadoras.find(x => x.id === id);
+    if (!t) return;
+
+    const pedidosUsando = pedidosEnviadosRegistro.filter(p => p.transportadoraId === id).length;
+
+    if (pedidosUsando > 0) {
+        alert('❌ Não é possível excluir!\n\n' + pedidosUsando + ' pedido(s) está(ão) usando esta transportadora.\n\nDesative a transportadora ao invés de excluir.');
+        return;
+    }
+
+    if (confirm('Excluir transportadora "' + t.nome + '"?')) {
+        transportadoras = transportadoras.filter(x => x.id !== id);
+        renderizarTransportadoras();
+        salvarDados();
+        alert('✅ Transportadora excluída!');
+    }
+}
+
 // INICIALIZAÇÃO
 window.addEventListener('load', async function() {
     await carregarDados();
@@ -2664,34 +2988,23 @@ window.addEventListener('load', async function() {
     renderizarPedidosMes();
     renderizarAcoes();
     atualizarDRE();
-    console.log('✅ Sistema carregado com registros permanentes!');
+    renderizarClientes();
+    renderizarTransportadoras();
+    carregarDadosEmpresa();
+    console.log('✅ Sistema carregado com sucesso!');
 });
 
+// Auto-save a cada 30 segundos
 setInterval(salvarDados, 30000);
 
+// Atualizar dashboard a cada 1 minuto
 setInterval(function() {
     if (!document.getElementById('page-dashboard').classList.contains('hidden')) {
         atualizarDashboard();
     }
 }, 60000);
 
-</script>   
-    </div>
-</div>
-
-<!-- Modal: Histórico do Cliente -->
-<div id="modalHistoricoCliente" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 800px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
-            <h3 style="font-size: 20px; font-weight: bold;">Histórico do Cliente</h3>
-            <button type="button" onclick="fecharModalHistoricoCliente()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
-        </div>
-        <div id="dadosClienteHistorico" style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 24px;"></div>
-        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📋 Histórico de Negócios</h4>
-        <div id="historicoNegociosCliente"></div>
-    </div>
-</div>
-
 </script>
+
 </body>
 </html>
