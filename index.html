@@ -90,9 +90,11 @@
         </div>
     </nav>
     <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
-        <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
-            <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
-        </div>
+    <div class="menu-item" onclick="irParaPagina('configuracoes')">
+        <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
+    </div>
+    <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
+        <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
     </div>
 </div>
 
@@ -350,6 +352,143 @@
         <div id="page-acoes" class="page-content hidden">
             <button class="btn btn-primary" onclick="abrirModalNovaAcao()" style="margin-bottom: 24px;">+ Nova Ação</button>
             <div id="gridAcoes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;"></div>
+        </div>
+
+<!-- CONFIGURAÇÕES DA EMPRESA -->
+        <div id="page-configuracoes" class="page-content hidden">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">Dados da Empresa</h2>
+                <p style="color: #6b7280;">Configure as informações da sua empresa</p>
+            </div>
+
+            <!-- Resumo Visual -->
+            <div class="card" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <h3 id="nomeEmpresaResumo" style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">Minha Empresa</h3>
+                        <p id="cnpjEmpresaResumo" style="opacity: 0.9; font-size: 16px;">CNPJ não cadastrado</p>
+                    </div>
+                    <i class="fas fa-building" style="font-size: 64px; opacity: 0.2;"></i>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">📋 Informações Cadastrais</h3>
+                
+                <form onsubmit="salvarDadosEmpresa(event)">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏢 Razão Social / Nome Fantasia *</label>
+                            <input type="text" id="nomeEmpresa" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Cheiro de Verde Ltda">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">📄 CNPJ</label>
+                            <input type="text" id="cnpjEmpresa" maxlength="18" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="00.000.000/0000-00">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">🆔 Inscrição Estadual</label>
+                            <input type="text" id="inscricaoEstadual" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="000.000.000.000">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">🆔 Inscrição Municipal</label>
+                            <input type="text" id="inscricaoMunicipal" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="00000000">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📍 Endereço Completo</label>
+                        <input type="text" id="enderecoEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Rua, número, bairro, cidade - UF, CEP">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">📞 Telefone</label>
+                            <input type="tel" id="telefoneEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 0000-0000">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">📱 Celular / WhatsApp</label>
+                            <input type="tel" id="celularEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 00000-0000">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">📧 Email</label>
+                            <input type="email" id="emailEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="contato@empresa.com">
+                        </div>
+                    </div>
+
+                    <div style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">👤 Responsável Legal</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Nome Completo</label>
+                                <input type="text" id="nomeResponsavel" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Nome do responsável">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">CPF</label>
+                                <input type="text" id="cpfResponsavel" maxlength="14" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="000.000.000-00">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">RG</label>
+                                <input type="text" id="rgResponsavel" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="00.000.000-0">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cargo</label>
+                                <input type="text" id="cargoResponsavel" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Diretor">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">🌐 Informações Adicionais</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Site</label>
+                                <input type="url" id="siteEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="https://...">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Instagram</label>
+                                <input type="text" id="instagramEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="@usuario">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Data de Fundação</label>
+                                <input type="date" id="dataFundacao" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">📝 Observações</label>
+                            <textarea id="observacoesEmpresa" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; resize: none;" placeholder="Informações adicionais..."></textarea>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; border-top: 2px solid #e5e7eb;">
+                        <button type="button" onclick="limparFormularioEmpresa()" class="btn" style="background: #e5e7eb;">
+                            <i class="fas fa-eraser"></i> Limpar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Dados
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" style="background: #eff6ff; border: 2px solid #3b82f6;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; color: #3b82f6;"></i>
+                    <div>
+                        <p style="color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Dados salvos no Firebase</p>
+                        <p style="color: #6b7280; font-size: 14px;">Sincronizados automaticamente em todos os dispositivos</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -768,6 +907,26 @@ let proximoIdVenda = 1;
 let pedidosEnviadosRegistro = [];
 let proximoIdPedidoEnviado = 1;
 
+// DADOS DA EMPRESA - ADICIONE AQUI ⬇️
+let dadosEmpresa = {
+    nome: '',
+    cnpj: '',
+    inscricaoEstadual: '',
+    inscricaoMunicipal: '',
+    endereco: '',
+    telefone: '',
+    celular: '',
+    email: '',
+    nomeResponsavel: '',
+    cpfResponsavel: '',
+    rgResponsavel: '',
+    cargoResponsavel: '',
+    site: '',
+    instagram: '',
+    dataFundacao: '',
+    observacoes: ''
+};
+
 // NAVEGAÇÃO
 function irParaPagina(pageName) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
@@ -780,7 +939,7 @@ function irParaPagina(pageName) {
         if (menuItem) menuItem.classList.add('active');
     }
     
-    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', clientes: 'Clientes', pedidos: 'Pedidos Enviados', acoes: 'Ações' };
+    const titles = { dashboard: 'Dashboard', faturamento: 'Faturamento', dre: 'DRE', crm: 'CRM', clientes: 'Clientes', pedidos: 'Pedidos Enviados', acoes: 'Ações', configuracoes: 'Dados da Empresa' };
     document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
     
     if (pageName === 'dashboard') atualizarDashboard();
@@ -790,6 +949,7 @@ function irParaPagina(pageName) {
 if (pageName === 'clientes') renderizarClientes();
     if (pageName === 'pedidos') renderizarPedidosMes();
     if (pageName === 'acoes') renderizarAcoes();
+if (pageName === 'configuracoes') carregarDadosEmpresa();
 }
 
 // SALVAR/CARREGAR
@@ -801,7 +961,7 @@ async function salvarDados() {
             pedidos, proximoIdPedido, acoes, proximoIdAcao,
             metaMensal, tarefasDia, proximoIdTarefa,
             vendasFechadasRegistro, proximoIdVenda,
-            pedidosEnviadosRegistro, proximoIdPedidoEnviado,
+            pedidosEnviadosRegistro, proximoIdPedidoEnviado, dadosEmpresa,
             ultimaAtualizacao: new Date().toISOString()
         };
         
@@ -850,6 +1010,7 @@ async function carregarDados() {
             proximoIdVenda = dados.proximoIdVenda || 1;
             pedidosEnviadosRegistro = dados.pedidosEnviadosRegistro || [];
             proximoIdPedidoEnviado = dados.proximoIdPedidoEnviado || 1;
+dadosEmpresa = dados.dadosEmpresa || dadosEmpresa;
             
             console.log('☁️ Carregado do Firebase!');
             localStorage.setItem('sistemaGestao', JSON.stringify(dados));
@@ -885,6 +1046,7 @@ function carregarDadosLocal() {
             proximoIdVenda = p.proximoIdVenda || 1;
             pedidosEnviadosRegistro = p.pedidosEnviadosRegistro || [];
             proximoIdPedidoEnviado = p.proximoIdPedidoEnviado || 1;
+dadosEmpresa = p.dadosEmpresa || dadosEmpresa;
             
             console.log('💾 Carregado localmente!');
         }
@@ -1983,6 +2145,93 @@ function salvarEdicaoPedidoEnviado(event) {
         fecharModalEditarPedidoEnviado();
         salvarDados();
         alert('✅ Pedido atualizado!');
+    }
+}
+
+// ==========================================
+// CONFIGURAÇÕES DA EMPRESA
+// ==========================================
+
+function carregarDadosEmpresa() {
+    document.getElementById('nomeEmpresa').value = dadosEmpresa.nome || '';
+    document.getElementById('cnpjEmpresa').value = dadosEmpresa.cnpj || '';
+    document.getElementById('inscricaoEstadual').value = dadosEmpresa.inscricaoEstadual || '';
+    document.getElementById('inscricaoMunicipal').value = dadosEmpresa.inscricaoMunicipal || '';
+    document.getElementById('enderecoEmpresa').value = dadosEmpresa.endereco || '';
+    document.getElementById('telefoneEmpresa').value = dadosEmpresa.telefone || '';
+    document.getElementById('celularEmpresa').value = dadosEmpresa.celular || '';
+    document.getElementById('emailEmpresa').value = dadosEmpresa.email || '';
+    document.getElementById('nomeResponsavel').value = dadosEmpresa.nomeResponsavel || '';
+    document.getElementById('cpfResponsavel').value = dadosEmpresa.cpfResponsavel || '';
+    document.getElementById('rgResponsavel').value = dadosEmpresa.rgResponsavel || '';
+    document.getElementById('cargoResponsavel').value = dadosEmpresa.cargoResponsavel || '';
+    document.getElementById('siteEmpresa').value = dadosEmpresa.site || '';
+    document.getElementById('instagramEmpresa').value = dadosEmpresa.instagram || '';
+    document.getElementById('dataFundacao').value = dadosEmpresa.dataFundacao || '';
+    document.getElementById('observacoesEmpresa').value = dadosEmpresa.observacoes || '';
+
+    atualizarResumoEmpresa();
+}
+
+function salvarDadosEmpresa(event) {
+    event.preventDefault();
+
+    dadosEmpresa = {
+        nome: document.getElementById('nomeEmpresa').value,
+        cnpj: document.getElementById('cnpjEmpresa').value,
+        inscricaoEstadual: document.getElementById('inscricaoEstadual').value,
+        inscricaoMunicipal: document.getElementById('inscricaoMunicipal').value,
+        endereco: document.getElementById('enderecoEmpresa').value,
+        telefone: document.getElementById('telefoneEmpresa').value,
+        celular: document.getElementById('celularEmpresa').value,
+        email: document.getElementById('emailEmpresa').value,
+        nomeResponsavel: document.getElementById('nomeResponsavel').value,
+        cpfResponsavel: document.getElementById('cpfResponsavel').value,
+        rgResponsavel: document.getElementById('rgResponsavel').value,
+        cargoResponsavel: document.getElementById('cargoResponsavel').value,
+        site: document.getElementById('siteEmpresa').value,
+        instagram: document.getElementById('instagramEmpresa').value,
+        dataFundacao: document.getElementById('dataFundacao').value,
+        observacoes: document.getElementById('observacoesEmpresa').value
+    };
+
+    atualizarResumoEmpresa();
+    salvarDados();
+    alert('✅ Dados da empresa salvos!\n\n☁️ Sincronizado com Firebase');
+}
+
+function atualizarResumoEmpresa() {
+    const nomeExibir = dadosEmpresa.nome || 'Minha Empresa';
+    const cnpjExibir = dadosEmpresa.cnpj ? 'CNPJ: ' + dadosEmpresa.cnpj : 'CNPJ não cadastrado';
+
+    document.getElementById('nomeEmpresaResumo').textContent = nomeExibir;
+    document.getElementById('cnpjEmpresaResumo').textContent = cnpjExibir;
+
+    // Atualizar nome na sidebar
+    const logoText = document.querySelector('.sidebar h2');
+    if (logoText && dadosEmpresa.nome) {
+        logoText.textContent = dadosEmpresa.nome;
+    }
+}
+
+function limparFormularioEmpresa() {
+    if (confirm('Limpar todos os campos?')) {
+        document.getElementById('nomeEmpresa').value = '';
+        document.getElementById('cnpjEmpresa').value = '';
+        document.getElementById('inscricaoEstadual').value = '';
+        document.getElementById('inscricaoMunicipal').value = '';
+        document.getElementById('enderecoEmpresa').value = '';
+        document.getElementById('telefoneEmpresa').value = '';
+        document.getElementById('celularEmpresa').value = '';
+        document.getElementById('emailEmpresa').value = '';
+        document.getElementById('nomeResponsavel').value = '';
+        document.getElementById('cpfResponsavel').value = '';
+        document.getElementById('rgResponsavel').value = '';
+        document.getElementById('cargoResponsavel').value = '';
+        document.getElementById('siteEmpresa').value = '';
+        document.getElementById('instagramEmpresa').value = '';
+        document.getElementById('dataFundacao').value = '';
+        document.getElementById('observacoesEmpresa').value = '';
     }
 }
 
