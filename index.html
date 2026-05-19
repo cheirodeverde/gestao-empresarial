@@ -39,6 +39,7 @@
         .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -2343,14 +2344,11 @@ function exportarClientes() {
     // Ordenar alfabeticamente
     clientes.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // Gerar CSV
-    let csv = 'LISTA DE CLIENTES\n\n';
-    csv += 'Nome;Telefone;Email;Total de Negócios;Valor Total;Ticket Médio;Última Compra;Status\n';
-
     const hoje = new Date();
     const diasInativo = 90;
 
-    clientes.forEach(c => {
+    // Preparar dados para Excel
+    const dadosExcel = clientes.map(c => {
         const qtdNegocios = c.negocios.length;
         const ticketMedio = qtdNegocios > 0 ? c.valorTotal / qtdNegocios : 0;
         
@@ -2364,20 +2362,52 @@ function exportarClientes() {
 
         const ultimaCompra = c.ultimaCompra ? new Date(c.ultimaCompra).toLocaleDateString('pt-BR') : 'Nunca';
 
-        csv += `${c.nome};${c.telefone || ''};${c.email || ''};${qtdNegocios};${c.valorTotal.toFixed(2)};${ticketMedio.toFixed(2)};${ultimaCompra};${status}\n`;
+        return {
+            'Nome': c.nome,
+            'Telefone': c.telefone || '',
+            'Email': c.email || '',
+            'Total de Negócios': qtdNegocios,
+            'Valor Total': 'R$ ' + c.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+            'Ticket Médio': 'R$ ' + ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+            'Última Compra': ultimaCompra,
+            'Status': status
+        };
     });
 
-    csv += `\nTOTAL DE CLIENTES: ${clientes.length}\n`;
-    csv += `GERADO EM: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\n`;
+    // Criar workbook e worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(dadosExcel);
 
-    // Download
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'clientes-' + new Date().toISOString().split('T')[0] + '.csv';
-    link.click();
+    // Ajustar largura das colunas
+    const wscols = [
+        {wch: 30},  // Nome
+        {wch: 20},  // Telefone
+        {wch: 30},  // Email
+        {wch: 18},  // Total Negócios
+        {wch: 20},  // Valor Total
+        {wch: 20},  // Ticket Médio
+        {wch: 18},  // Última Compra
+        {wch: 12}   // Status
+    ];
+    ws['!cols'] = wscols;
 
-    alert('✅ Lista de clientes exportada!\n\n' + clientes.length + ' cliente(s) exportado(s)');
+    // Adicionar worksheet ao workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+
+    // Adicionar uma segunda aba com resumo
+    const resumo = [
+        {Item: 'Total de Clientes', Valor: clientes.length},
+        {Item: 'Data de Exportação', Valor: new Date().toLocaleDateString('pt-BR')},
+        {Item: 'Hora de Exportação', Valor: new Date().toLocaleTimeString('pt-BR')}
+    ];
+    const wsResumo = XLSX.utils.json_to_sheet(resumo);
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+
+    // Gerar arquivo Excel e fazer download
+    const nomeArquivo = 'clientes-' + new Date().toISOString().split('T')[0] + '.xlsx';
+    XLSX.writeFile(wb, nomeArquivo);
+
+    alert('✅ Lista de clientes exportada em Excel!\n\n📊 ' + clientes.length + ' cliente(s)\n📁 Arquivo: ' + nomeArquivo + '\n\n💡 O arquivo tem 2 abas:\n• Clientes (lista completa)\n• Resumo (estatísticas)');
 }
 
 // INICIALIZAÇÃO
