@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão Empresarial</title>
+    <title>Sistema de Gestão Empresarial Multi-empresa</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -89,8 +89,8 @@
 <!-- SIDEBAR DINÂMICA -->
 <div class="sidebar">
     <div style="padding: 20px; border-bottom: 1px solid #374151;">
-        <h2 id="nomeEmpresaSidebar" style="font-size: 20px; font-weight: bold;">Minha Empresa</h2>
-        <p id="usuarioLogadoInfo" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Usuário não identificado</p>
+        <h2 id="nomeEmpresaSidebar" style="font-size: 20px; font-weight: bold;">Sistema de Gestão</h2>
+        <p id="usuarioLogadoInfo" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Não autenticado</p>
     </div>
     <nav id="menuNavegacao" style="padding: 20px 0;">
         <!-- Menu será carregado dinamicamente -->
@@ -108,7 +108,7 @@
         </div>
         
         <!-- Configurações da Empresa Atual -->
-        <div id="menuConfiguracoes" class="menu-item" onclick="irParaPagina('configuracoes')">
+        <div id="menuConfiguracoes" class="menu-item hidden" onclick="irParaPagina('configuracoes')">
             <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
         </div>
         
@@ -122,7 +122,7 @@
     <header style="background: white; padding: 20px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <h1 id="page-title" style="font-size: 24px; font-weight: bold;">Dashboard Principal</h1>
+                <h1 id="page-title" style="font-size: 24px; font-weight: bold;">Sistema de Gestão</h1>
                 <span id="statusFirebase" style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #16a34a; background: #dcfce7; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
                     <span style="width: 8px; height: 8px; background: #16a34a; border-radius: 50%; animation: pulse 2s infinite;"></span>
                     Firebase OK
@@ -488,7 +488,7 @@
                             </div>
                             <div>
                                 <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cargo</label>
-                                <input type="text" id="cargoResponsavel" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Diretor, Sócio, Proprietário">
+                                <input type="text" id="cargoResponsavel" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Diretor, Sócio">
                             </div>
                         </div>
                     </div>
@@ -513,7 +513,7 @@
 
                         <div style="margin-bottom: 24px;">
                             <label style="display: block; font-weight: 600; margin-bottom: 8px;">📝 Observações</label>
-                            <textarea id="observacoesEmpresa" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; resize: none;" placeholder="Informações adicionais sobre a empresa..."></textarea>
+                            <textarea id="observacoesEmpresa" rows="3" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; resize: none;" placeholder="Informações adicionais..."></textarea>
                         </div>
                     </div>
 
@@ -522,7 +522,7 @@
                             <i class="fas fa-eraser"></i> Limpar
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Salvar Dados da Empresa
+                            <i class="fas fa-save"></i> Salvar Dados
                         </button>
                     </div>
                 </form>
@@ -532,14 +532,14 @@
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <i class="fas fa-info-circle" style="font-size: 24px; color: #3b82f6;"></i>
                     <div>
-                        <p style="color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Esses dados serão salvos no Firebase</p>
-                        <p style="color: #6b7280; font-size: 14px;">Sincronizados automaticamente e acessíveis de qualquer dispositivo</p>
+                        <p style="color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Dados salvos no Firebase</p>
+                        <p style="color: #6b7280; font-size: 14px;">Sincronizados automaticamente</p>
                     </div>
                 </div>
             </div>
         </div>
 
-<!-- PÁGINA: EMPRESAS (NOVA) -->
+<!-- PÁGINA: EMPRESAS -->
         <div id="page-empresas" class="page-content hidden">
             <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
                 <div>
@@ -575,7 +575,7 @@
             </div>
         </div>
 
-<!-- PÁGINA: USUÁRIOS (NOVA) -->
+<!-- PÁGINA: USUÁRIOS -->
         <div id="page-usuarios" class="page-content hidden">
             <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
                 <div>
@@ -813,7 +813,7 @@
         <div id="listaColunas"></div>
         <div style="background: #dcfce7; border-left: 4px solid #16a34a; padding: 16px; border-radius: 8px; margin-top: 20px;">
             <p style="font-size: 14px; color: #166534;">
-                <i class="fas fa-lock"></i> <strong>"Venda Fechada"</strong> é protegida e não pode ser excluída (usada para faturamento)
+                <i class="fas fa-lock"></i> <strong>"Venda Fechada"</strong> é protegida e não pode ser excluída
             </p>
         </div>
     </div>
@@ -957,7 +957,7 @@
             
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-weight: 600; margin-bottom: 8px;">🚚 Nome da Transportadora *</label>
-                <input type="text" id="nomeTransportadora" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Correios, Jadlog, Total Express">
+                <input type="text" id="nomeTransportadora" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Correios, Jadlog">
             </div>
 
             <div style="margin-bottom: 16px;">
@@ -968,7 +968,7 @@
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔗 Link de Rastreamento *</label>
                 <input type="url" id="linkRastreamento" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="https://exemplo.com/rastreamento?codigo=">
-                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">💡 O código será adicionado automaticamente ao final do link</p>
+                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">💡 O código será adicionado ao final</p>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
@@ -989,15 +989,6 @@
                 </label>
             </div>
 
-            <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="font-size: 14px; color: #1e40af;">
-                    <i class="fas fa-info-circle"></i> <strong>Como usar:</strong><br>
-                    • Cole o link base de rastreamento<br>
-                    • O código será anexado automaticamente nos pedidos<br>
-                    • Exemplo: https://rastreamento.com/codigo/<strong>CODIGO_AQUI</strong>
-                </p>
-            </div>
-
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button type="button" onclick="fecharModalTransportadora()" class="btn" style="background: #e5e7eb;">Cancelar</button>
                 <button type="submit" class="btn btn-primary">
@@ -1016,7 +1007,6 @@
             <button type="button" onclick="fecharModalEmpresa()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
         </div>
 
-        <!-- Abas -->
         <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb;">
             <button id="abaEmpresaDados" onclick="trocarAbaEmpresa('dados')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #3b82f6; border-bottom: 3px solid #3b82f6;">
                 <i class="fas fa-building"></i> Dados da Empresa
@@ -1029,7 +1019,6 @@
         <form onsubmit="salvarEmpresa(event)">
             <input type="hidden" id="empresaId">
 
-            <!-- ABA: DADOS DA EMPRESA -->
             <div id="abaEmpresaDadosConteudo">
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
                     <div>
@@ -1070,7 +1059,7 @@
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 8px;">📌 Estado (UF)</label>
                         <select id="empresaEstado" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
-                            <option value="">Selecione</option>
+                            <option value="">UF</option>
                             <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
                             <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
                             <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
@@ -1101,17 +1090,16 @@
                 </div>
             </div>
 
-            <!-- ABA: MÓDULOS LIBERADOS -->
             <div id="abaEmpresaModulosConteudo" class="hidden">
                 <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                     <p style="color: #1e40af; font-size: 14px;">
-                        <i class="fas fa-info-circle"></i> <strong>Selecione os módulos que estarão disponíveis para esta empresa.</strong>
-                        Os usuários da empresa poderão acessar apenas os módulos liberados aqui.
+                        <i class="fas fa-info-circle"></i> <strong>Selecione os módulos disponíveis para esta empresa.</strong>
+                        Os usuários poderão acessar apenas os módulos liberados aqui.
                     </p>
                 </div>
 
                 <div id="listaModulosEmpresa" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                    <!-- Módulos serão carregados dinamicamente -->
+                    <!-- Carregado dinamicamente -->
                 </div>
             </div>
 
@@ -1135,7 +1123,6 @@
             <button type="button" onclick="fecharModalUsuario()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
         </div>
 
-        <!-- Abas -->
         <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb;">
             <button id="abaUsuarioDados" onclick="trocarAbaUsuario('dados')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #3b82f6; border-bottom: 3px solid #3b82f6;">
                 <i class="fas fa-user"></i> Dados do Usuário
@@ -1148,7 +1135,6 @@
         <form onsubmit="salvarUsuario(event)">
             <input type="hidden" id="usuarioId">
 
-            <!-- ABA: DADOS DO USUÁRIO -->
             <div id="abaUsuarioDadosConteudo">
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏢 Empresa *</label>
@@ -1192,12 +1178,11 @@
                 </div>
             </div>
 
-            <!-- ABA: PERMISSÕES -->
             <div id="abaUsuarioPermissoesConteudo" class="hidden">
                 <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                     <p style="color: #1e40af; font-size: 14px;">
                         <i class="fas fa-info-circle"></i> <strong>Defina as permissões de acesso aos módulos.</strong>
-                        <br>Apenas módulos liberados para a empresa estarão disponíveis aqui.
+                        <br>Apenas módulos liberados para a empresa estarão disponíveis.
                     </p>
                 </div>
 
@@ -1207,7 +1192,7 @@
                 </div>
 
                 <div id="listaPermissoesUsuario" class="hidden">
-                    <!-- Permissões serão carregadas dinamicamente -->
+                    <!-- Carregado dinamicamente -->
                 </div>
             </div>
 
@@ -1224,7 +1209,9 @@
 </div>
 
 <script>
+// ==========================================
 // FIREBASE CONFIG
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyBgAkk1jsSqq-8mB_2zzQllfmzSnCNidek",
   authDomain: "sistema-gestao-cheirodeverde.firebaseapp.com",
@@ -1238,7 +1225,11 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log('🔥 Firebase inicializado!');
 
-// VARIÁVEIS GLOBAIS EXISTENTES
+// ==========================================
+// VARIÁVEIS GLOBAIS
+// ==========================================
+
+// Variáveis de contexto atual (carregadas da empresa ativa)
 let canaisVenda = [];
 let proximoIdCanal = 1;
 let gastos = [];
@@ -1266,27 +1257,15 @@ let proximoIdVenda = 1;
 let pedidosEnviadosRegistro = [];
 let proximoIdPedidoEnviado = 1;
 let dadosEmpresa = {
-    nome: '',
-    cnpj: '',
-    inscricaoEstadual: '',
-    inscricaoMunicipal: '',
-    endereco: '',
-    telefone: '',
-    celular: '',
-    email: '',
-    nomeResponsavel: '',
-    cpfResponsavel: '',
-    rgResponsavel: '',
-    cargoResponsavel: '',
-    site: '',
-    instagram: '',
-    dataFundacao: '',
-    observacoes: ''
+    nome: '', cnpj: '', inscricaoEstadual: '', inscricaoMunicipal: '',
+    endereco: '', telefone: '', celular: '', email: '',
+    nomeResponsavel: '', cpfResponsavel: '', rgResponsavel: '', cargoResponsavel: '',
+    site: '', instagram: '', dataFundacao: '', observacoes: ''
 };
 let transportadoras = [];
 let proximoIdTransportadora = 1;
 
-// NOVAS VARIÁVEIS MULTI-EMPRESA
+// Variáveis Multi-empresa
 let empresas = [];
 let proximoIdEmpresa = 1;
 let usuarios = [];
@@ -1294,7 +1273,9 @@ let proximoIdUsuario = 1;
 let usuarioLogado = null;
 let empresaAtual = null;
 
-// DEFINIÇÃO DOS MÓDULOS DO SISTEMA
+// Dados isolados por empresa
+let dadosPorEmpresa = {};
+
 const MODULOS_SISTEMA = [
     { id: 'dashboard', nome: 'Dashboard', icone: 'fa-chart-line', descricao: 'Visão geral e métricas' },
     { id: 'faturamento', nome: 'Canais de Venda', icone: 'fa-dollar-sign', descricao: 'Gestão de faturamento' },
@@ -1321,6 +1302,101 @@ const SUPER_ADMIN = {
 };
 
 // ==========================================
+// FUNÇÕES DE CONTEXTO DE EMPRESA
+// ==========================================
+
+function obterDadosEmpresaAtual() {
+    if (!empresaAtual) return null;
+    
+    if (!dadosPorEmpresa[empresaAtual.id]) {
+        inicializarDadosEmpresa(empresaAtual.id);
+    }
+    
+    return dadosPorEmpresa[empresaAtual.id];
+}
+
+function inicializarDadosEmpresa(empresaId) {
+    dadosPorEmpresa[empresaId] = {
+        canaisVenda: [],
+        proximoIdCanal: 1,
+        gastos: [],
+        proximoIdGasto: 1,
+        etapasPipeline: [
+            { id: 1, nome: 'Lead', cor: '#3b82f6', fixo: false },
+            { id: 2, nome: 'Venda Fechada', cor: '#16a34a', fixo: true },
+            { id: 3, nome: 'Contato Inicial', cor: '#8b5cf6', fixo: false },
+            { id: 4, nome: 'Proposta Enviada', cor: '#f59e0b', fixo: false },
+            { id: 5, nome: 'Negociação', cor: '#06b6d4', fixo: false },
+            { id: 6, nome: 'Pedido Enviado', cor: '#ec4899', fixo: false }
+        ],
+        negocios: [],
+        proximoIdNegocio: 1,
+        pedidos: [],
+        proximoIdPedido: 1,
+        acoes: [],
+        proximoIdAcao: 1,
+        metaMensal: 0,
+        tarefasDia: [],
+        proximoIdTarefa: 1,
+        vendasFechadasRegistro: [],
+        proximoIdVenda: 1,
+        pedidosEnviadosRegistro: [],
+        proximoIdPedidoEnviado: 1,
+        transportadoras: [],
+        proximoIdTransportadora: 1,
+        dadosEmpresa: {
+            nome: '', cnpj: '', inscricaoEstadual: '', inscricaoMunicipal: '',
+            endereco: '', telefone: '', celular: '', email: '',
+            nomeResponsavel: '', cpfResponsavel: '', rgResponsavel: '', cargoResponsavel: '',
+            site: '', instagram: '', dataFundacao: '', observacoes: ''
+        }
+    };
+}
+
+function carregarContextoEmpresa() {
+    if (!empresaAtual) return;
+    
+    const dados = obterDadosEmpresaAtual();
+    if (!dados) return;
+    
+    canaisVenda = dados.canaisVenda;
+    proximoIdCanal = dados.proximoIdCanal;
+    gastos = dados.gastos;
+    proximoIdGasto = dados.proximoIdGasto;
+    etapasPipeline = dados.etapasPipeline;
+    negocios = dados.negocios;
+    proximoIdNegocio = dados.proximoIdNegocio;
+    pedidos = dados.pedidos;
+    proximoIdPedido = dados.proximoIdPedido;
+    acoes = dados.acoes;
+    proximoIdAcao = dados.proximoIdAcao;
+    metaMensal = dados.metaMensal;
+    tarefasDia = dados.tarefasDia;
+    proximoIdTarefa = dados.proximoIdTarefa;
+    vendasFechadasRegistro = dados.vendasFechadasRegistro;
+    proximoIdVenda = dados.proximoIdVenda;
+    pedidosEnviadosRegistro = dados.pedidosEnviadosRegistro;
+    proximoIdPedidoEnviado = dados.proximoIdPedidoEnviado;
+    transportadoras = dados.transportadoras;
+    proximoIdTransportadora = dados.proximoIdTransportadora;
+    dadosEmpresa = dados.dadosEmpresa;
+}
+
+function salvarContextoEmpresa() {
+    if (!empresaAtual) return;
+    
+    dadosPorEmpresa[empresaAtual.id] = {
+        canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
+        etapasPipeline, negocios, proximoIdNegocio,
+        pedidos, proximoIdPedido, acoes, proximoIdAcao,
+        metaMensal, tarefasDia, proximoIdTarefa,
+        vendasFechadasRegistro, proximoIdVenda,
+        pedidosEnviadosRegistro, proximoIdPedidoEnviado,
+        transportadoras, proximoIdTransportadora, dadosEmpresa
+    };
+}
+
+// ==========================================
 // AUTENTICAÇÃO MULTI-EMPRESA
 // ==========================================
 
@@ -1330,7 +1406,6 @@ function fazerLoginMultiempresa(event) {
     const login = document.getElementById('loginUsuario').value.trim();
     const senha = document.getElementById('senhaUsuario').value;
     
-    // Verificar se é o Super Admin
     if (login === SUPER_ADMIN.login && senha === SUPER_ADMIN.senha) {
         usuarioLogado = SUPER_ADMIN;
         empresaAtual = null;
@@ -1343,7 +1418,6 @@ function fazerLoginMultiempresa(event) {
         return;
     }
     
-    // Verificar usuários cadastrados
     const usuario = usuarios.find(u => 
         (u.login === login || u.email === login) && 
         u.senha === senha && 
@@ -1351,7 +1425,6 @@ function fazerLoginMultiempresa(event) {
     );
     
     if (usuario) {
-        // Verificar se a empresa está ativa
         const empresa = empresas.find(e => e.id === usuario.empresaId);
         
         if (!empresa) {
@@ -1364,7 +1437,6 @@ function fazerLoginMultiempresa(event) {
             return;
         }
         
-        // Login bem-sucedido
         usuarioLogado = usuario;
         empresaAtual = empresa;
         
@@ -1412,6 +1484,12 @@ function verificarAutenticacao() {
 
 function fazerLogout() {
     if (confirm('Deseja sair do sistema?')) {
+        // Salvar contexto antes de sair
+        if (empresaAtual) {
+            salvarContextoEmpresa();
+            salvarDados();
+        }
+        
         sessionStorage.removeItem('usuarioLogado');
         sessionStorage.removeItem('empresaAtual');
         usuarioLogado = null;
@@ -1439,6 +1517,8 @@ function carregarSistemaUsuario() {
     document.getElementById('menuAdministracao').classList.add('hidden');
     document.getElementById('menuConfiguracoes').classList.remove('hidden');
     
+    carregarContextoEmpresa();
+    
     const modulosPermitidos = Object.keys(usuarioLogado.permissoes || {}).filter(modulo => {
         const permissoes = usuarioLogado.permissoes[modulo];
         return permissoes.consultar || permissoes.cadastrar || permissoes.relatorios;
@@ -1449,8 +1529,10 @@ function carregarSistemaUsuario() {
     if (modulosPermitidos.length > 0) {
         irParaPagina(modulosPermitidos[0]);
     } else {
-        alert('⚠️ Você não tem permissão para acessar nenhum módulo. Entre em contato com o administrador.');
+        alert('⚠️ Você não tem permissão para acessar nenhum módulo.');
     }
+    
+    console.log('✅ Contexto da empresa "' + (empresaAtual.nomeFantasia || empresaAtual.razaoSocial) + '" carregado');
 }
 
 function carregarMenuNavegacao(modulosPermitidos) {
@@ -1495,6 +1577,287 @@ function bloquearAcaoSemPermissao(modulo, tipo) {
 }
 
 document.addEventListener('DOMContentLoaded', verificarAutenticacao);
+
+// ==========================================
+// NAVEGAÇÃO COM ISOLAMENTO POR EMPRESA
+// ==========================================
+
+function irParaPagina(pageName) {
+    if (empresaAtual && usuarioLogado?.tipo !== 'super_admin') {
+        salvarContextoEmpresa();
+    }
+    
+    if (usuarioLogado && usuarioLogado.tipo !== 'super_admin' && pageName !== 'empresas' && pageName !== 'usuarios') {
+        if (!verificarPermissao(pageName, 'consultar')) {
+            alert('❌ Você não tem permissão para acessar este módulo!');
+            return;
+        }
+    }
+    
+    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    const pagina = document.getElementById('page-' + pageName);
+    if (pagina) pagina.classList.remove('hidden');
+    
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    if (event && event.target) {
+        const menuItem = event.target.closest('.menu-item');
+        if (menuItem) menuItem.classList.add('active');
+    }
+    
+    const titles = { 
+        dashboard: 'Dashboard', faturamento: 'Canais de Venda', dre: 'DRE', crm: 'CRM', 
+        clientes: 'Clientes', pedidos: 'Pedidos Enviados', acoes: 'Ações', 
+        transportadoras: 'Transportadoras', configuracoes: 'Dados da Empresa',
+        empresas: 'Gestão de Empresas', usuarios: 'Gestão de Usuários'
+    };
+    document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
+    
+    if (pageName === 'dashboard') atualizarDashboard();
+    if (pageName === 'faturamento') renderizarCanais();
+    if (pageName === 'dre') atualizarDRE();
+    if (pageName === 'crm') renderizarKanban();
+    if (pageName === 'clientes') renderizarClientes();
+    if (pageName === 'transportadoras') renderizarTransportadoras();
+    if (pageName === 'pedidos') renderizarPedidosMes();
+    if (pageName === 'acoes') renderizarAcoes();
+    if (pageName === 'configuracoes') carregarDadosEmpresa();
+    if (pageName === 'empresas') renderizarEmpresas();
+    if (pageName === 'usuarios') {
+        carregarFiltrosUsuarios();
+        renderizarUsuarios();
+    }
+}
+
+// ==========================================
+// SALVAR/CARREGAR COM ISOLAMENTO POR EMPRESA
+// ==========================================
+
+async function salvarDados() {
+    if (empresaAtual) {
+        salvarContextoEmpresa();
+    }
+    
+    try {
+        const dados = {
+            empresas,
+            proximoIdEmpresa,
+            usuarios,
+            proximoIdUsuario,
+            dadosPorEmpresa,
+            ultimaAtualizacao: new Date().toISOString(),
+            versao: '3.0-multiempresa-isolado'
+        };
+        
+        await db.collection('empresas').doc('minha-empresa').set(dados);
+        localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+        console.log('💾 Salvo no Firebase (Multi-empresa isolado)!');
+    } catch(error) {
+        console.error('Erro Firebase:', error);
+        try {
+            const dados = {
+                empresas, proximoIdEmpresa, usuarios, proximoIdUsuario, dadosPorEmpresa
+            };
+            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+            console.log('💾 Salvo localmente');
+        } catch(e) { 
+            console.log('Erro salvar'); 
+        }
+    }
+}
+
+async function carregarDados() {
+    try {
+        const doc = await db.collection('empresas').doc('minha-empresa').get();
+        
+        if (doc.exists) {
+            const dados = doc.data();
+            
+            empresas = dados.empresas || [];
+            proximoIdEmpresa = dados.proximoIdEmpresa || 1;
+            usuarios = dados.usuarios || [];
+            proximoIdUsuario = dados.proximoIdUsuario || 1;
+            dadosPorEmpresa = dados.dadosPorEmpresa || {};
+            
+            if (dados.versao !== '3.0-multiempresa-isolado' && dados.canaisVenda) {
+                console.log('🔄 Migrando dados antigos...');
+                migrarDadosAntigos(dados);
+            }
+            
+            console.log('☁️ Carregado do Firebase!');
+            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
+        } else {
+            carregarDadosLocal();
+        }
+    } catch(error) {
+        console.error('Erro Firebase:', error);
+        carregarDadosLocal();
+    }
+}
+
+function carregarDadosLocal() {
+    try {
+        const dados = localStorage.getItem('sistemaGestao');
+        if (dados) {
+            const p = JSON.parse(dados);
+            
+            empresas = p.empresas || [];
+            proximoIdEmpresa = p.proximoIdEmpresa || 1;
+            usuarios = p.usuarios || [];
+            proximoIdUsuario = p.proximoIdUsuario || 1;
+            dadosPorEmpresa = p.dadosPorEmpresa || {};
+            
+            if (p.versao !== '3.0-multiempresa-isolado' && p.canaisVenda) {
+                console.log('🔄 Migrando dados antigos (local)...');
+                migrarDadosAntigos(p);
+            }
+            
+            console.log('💾 Carregado localmente!');
+        }
+    } catch(e) { 
+        console.log('Erro carregar'); 
+    }
+}
+
+function migrarDadosAntigos(dadosAntigos) {
+    let empresaLegado = empresas.find(e => e.razaoSocial === 'Cheiro de Verde');
+    
+    if (!empresaLegado) {
+        empresaLegado = {
+            id: proximoIdEmpresa++,
+            razaoSocial: 'Cheiro de Verde',
+            cnpj: dadosAntigos.dadosEmpresa?.cnpj || '',
+            nomeFantasia: dadosAntigos.dadosEmpresa?.nome || 'Cheiro de Verde',
+            endereco: dadosAntigos.dadosEmpresa?.endereco || '',
+            numero: '',
+            bairro: '',
+            cidade: '',
+            estado: '',
+            email: dadosAntigos.dadosEmpresa?.email || '',
+            telefone: dadosAntigos.dadosEmpresa?.telefone || '',
+            ativa: true,
+            modulos: MODULOS_SISTEMA.map(m => m.id),
+            dataCriacao: new Date().toISOString()
+        };
+        
+        empresas.push(empresaLegado);
+        console.log('✅ Empresa "Cheiro de Verde" criada');
+    }
+    
+    dadosPorEmpresa[empresaLegado.id] = {
+        canaisVenda: dadosAntigos.canaisVenda || [],
+        proximoIdCanal: dadosAntigos.proximoIdCanal || 1,
+        gastos: dadosAntigos.gastos || [],
+        proximoIdGasto: dadosAntigos.proximoIdGasto || 1,
+        etapasPipeline: dadosAntigos.etapasPipeline || etapasPipeline,
+        negocios: dadosAntigos.negocios || [],
+        proximoIdNegocio: dadosAntigos.proximoIdNegocio || 1,
+        pedidos: dadosAntigos.pedidos || [],
+        proximoIdPedido: dadosAntigos.proximoIdPedido || 1,
+        acoes: dadosAntigos.acoes || [],
+        proximoIdAcao: dadosAntigos.proximoIdAcao || 1,
+        metaMensal: dadosAntigos.metaMensal || 0,
+        tarefasDia: dadosAntigos.tarefasDia || [],
+        proximoIdTarefa: dadosAntigos.proximoIdTarefa || 1,
+        vendasFechadasRegistro: dadosAntigos.vendasFechadasRegistro || [],
+        proximoIdVenda: dadosAntigos.proximoIdVenda || 1,
+        pedidosEnviadosRegistro: dadosAntigos.pedidosEnviadosRegistro || [],
+        proximoIdPedidoEnviado: dadosAntigos.proximoIdPedidoEnviado || 1,
+        transportadoras: dadosAntigos.transportadoras || [],
+        proximoIdTransportadora: dadosAntigos.proximoIdTransportadora || 1,
+        dadosEmpresa: dadosAntigos.dadosEmpresa || {}
+    };
+    
+    const usuarioExistente = usuarios.find(u => u.empresaId === empresaLegado.id);
+    
+    if (!usuarioExistente) {
+        const permissoesCompletas = {};
+        MODULOS_SISTEMA.forEach(modulo => {
+            permissoesCompletas[modulo.id] = {
+                consultar: true,
+                cadastrar: true,
+                relatorios: true
+            };
+        });
+        
+        usuarios.push({
+            id: proximoIdUsuario++,
+            empresaId: empresaLegado.id,
+            nome: 'Administrador Cheiro de Verde',
+            email: 'admin@cheirodeverde.com',
+            telefone: '',
+            login: 'cheirodeverde',
+            senha: 'cheiro123',
+            ativo: true,
+            permissoes: permissoesCompletas,
+            dataCriacao: new Date().toISOString()
+        });
+        
+        console.log('✅ Usuário "cheirodeverde" criado (senha: cheiro123)');
+    }
+    
+    salvarDados();
+    console.log('✅ Migração concluída!');
+}
+
+function exportarBackup() {
+    if (empresaAtual) {
+        salvarContextoEmpresa();
+    }
+    
+    const backup = {
+        data: new Date().toISOString(),
+        versao: '3.0-multiempresa-isolado',
+        dados: {
+            empresas,
+            proximoIdEmpresa,
+            usuarios,
+            proximoIdUsuario,
+            dadosPorEmpresa
+        }
+    };
+    
+    const dataStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'backup-multiempresa-' + new Date().toISOString().split('T')[0] + '.json';
+    link.click();
+    alert('✅ Backup Multi-empresa realizado!');
+}
+
+function importarBackup() {
+    if (!confirm('⚠️ Substituir todos os dados?')) return;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const backup = JSON.parse(e.target.result);
+                const d = backup.dados;
+                
+                empresas = d.empresas || [];
+                proximoIdEmpresa = d.proximoIdEmpresa || 1;
+                usuarios = d.usuarios || [];
+                proximoIdUsuario = d.proximoIdUsuario || 1;
+                dadosPorEmpresa = d.dadosPorEmpresa || {};
+                
+                salvarDados();
+                location.reload();
+            } catch (error) {
+                alert('❌ Arquivo inválido!');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
 
 // ==========================================
 // GESTÃO DE EMPRESAS
@@ -1562,15 +1925,11 @@ function renderizarEmpresas() {
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📞 Telefone</p>
-                                <p style="font-size: 14px; font-weight: 600;">${empresa.telefone || 'Não informado'}</p>
+                                <p style="font-size: 14px; font-weight: 600;">${empresa.telefone || '-'}</p>
                             </div>
                         </div>
                         
-                        ${empresa.email ? `
-                            <div style="font-size: 14px; color: #6b7280;">
-                                <i class="fas fa-envelope"></i> ${empresa.email}
-                            </div>
-                        ` : ''}
+                        ${empresa.email ? `<div style="font-size: 14px; color: #6b7280;"><i class="fas fa-envelope"></i> ${empresa.email}</div>` : ''}
                     </div>
                     
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
@@ -1711,15 +2070,19 @@ function salvarEmpresa(event) {
         const empresa = empresas.find(e => e.id === parseInt(id));
         if (empresa) {
             Object.assign(empresa, dadosEmpresa);
-            alert('✅ Empresa atualizada com sucesso!\n\n📦 Módulos liberados: ' + modulosSelecionados.length);
+            alert('✅ Empresa atualizada!\n\n📦 Módulos: ' + modulosSelecionados.length);
         }
     } else {
-        empresas.push({
+        const novaEmpresa = {
             id: proximoIdEmpresa++,
             ...dadosEmpresa,
             dataCriacao: new Date().toISOString()
-        });
-        alert('✅ Empresa cadastrada com sucesso!\n\n📦 Módulos liberados: ' + modulosSelecionados.length);
+        };
+        
+        empresas.push(novaEmpresa);
+        inicializarDadosEmpresa(novaEmpresa.id);
+        
+        alert('✅ Empresa cadastrada!\n\n📦 Módulos: ' + modulosSelecionados.length);
     }
     
     renderizarEmpresas();
@@ -1734,15 +2097,16 @@ function excluirEmpresa(empresaId) {
     const usuariosDaEmpresa = usuarios.filter(u => u.empresaId === empresaId);
     
     if (usuariosDaEmpresa.length > 0) {
-        alert('❌ Não é possível excluir!\n\n' + usuariosDaEmpresa.length + ' usuário(s) vinculado(s) a esta empresa.\n\nExclua ou transfira os usuários primeiro.');
+        alert('❌ Não é possível excluir!\n\n' + usuariosDaEmpresa.length + ' usuário(s) vinculado(s).');
         return;
     }
     
-    if (confirm('❌ Excluir empresa "' + empresa.razaoSocial + '"?\n\nEsta ação não pode ser desfeita!')) {
+    if (confirm('❌ Excluir empresa "' + empresa.razaoSocial + '"?\n\nTodos os dados serão perdidos!')) {
         empresas = empresas.filter(e => e.id !== empresaId);
+        delete dadosPorEmpresa[empresaId];
         renderizarEmpresas();
         salvarDados();
-        alert('✅ Empresa excluída com sucesso!');
+        alert('✅ Empresa excluída!');
     }
 }
 
@@ -1950,7 +2314,7 @@ function carregarModulosEmpresaUsuario() {
     if (!empresa || !empresa.modulos || empresa.modulos.length === 0) {
         document.getElementById('mensagemSelecioneEmpresa').innerHTML = `
             <i class="fas fa-exclamation-triangle" style="font-size: 48px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
-            <p style="font-size: 16px; font-weight: 600;">Nenhum módulo liberado para esta empresa</p>
+            <p style="font-size: 16px; font-weight: 600;">Nenhum módulo liberado</p>
             <p style="font-size: 14px; margin-top: 8px;">Configure os módulos na edição da empresa</p>
         `;
         document.getElementById('mensagemSelecioneEmpresa').classList.remove('hidden');
@@ -2058,7 +2422,7 @@ function salvarUsuario(event) {
         const usuario = usuarios.find(u => u.id === parseInt(id));
         if (usuario) {
             Object.assign(usuario, dadosUsuario);
-            alert('✅ Usuário atualizado com sucesso!');
+            alert('✅ Usuário atualizado!');
         }
     } else {
         usuarios.push({
@@ -2066,7 +2430,7 @@ function salvarUsuario(event) {
             ...dadosUsuario,
             dataCriacao: new Date().toISOString()
         });
-        alert('✅ Usuário cadastrado com sucesso!');
+        alert('✅ Usuário cadastrado!');
     }
     
     renderizarUsuarios();
@@ -2078,282 +2442,16 @@ function excluirUsuario(usuarioId) {
     const usuario = usuarios.find(u => u.id === usuarioId);
     if (!usuario) return;
     
-    if (confirm('❌ Excluir usuário "' + usuario.nome + '"?\n\nEsta ação não pode ser desfeita!')) {
+    if (confirm('❌ Excluir usuário "' + usuario.nome + '"?')) {
         usuarios = usuarios.filter(u => u.id !== usuarioId);
         renderizarUsuarios();
         salvarDados();
-        alert('✅ Usuário excluído com sucesso!');
+        alert('✅ Usuário excluído!');
     }
 }
 
 // ==========================================
-// NAVEGAÇÃO COM CONTROLE DE PERMISSÕES
-// ==========================================
-
-function irParaPagina(pageName) {
-    // Verificar permissão (exceto super admin)
-    if (usuarioLogado && usuarioLogado.tipo !== 'super_admin' && pageName !== 'empresas' && pageName !== 'usuarios') {
-        if (!verificarPermissao(pageName, 'consultar')) {
-            alert('❌ Você não tem permissão para acessar este módulo!');
-            return;
-        }
-    }
-    
-    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-    const pagina = document.getElementById('page-' + pageName);
-    if (pagina) pagina.classList.remove('hidden');
-    
-    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-    if (event && event.target) {
-        const menuItem = event.target.closest('.menu-item');
-        if (menuItem) menuItem.classList.add('active');
-    }
-    
-    const titles = { 
-        dashboard: 'Dashboard', 
-        faturamento: 'Canais de Venda', 
-        dre: 'DRE', 
-        crm: 'CRM', 
-        clientes: 'Clientes', 
-        pedidos: 'Pedidos Enviados', 
-        acoes: 'Ações', 
-        transportadoras: 'Transportadoras', 
-        configuracoes: 'Dados da Empresa',
-        empresas: 'Gestão de Empresas',
-        usuarios: 'Gestão de Usuários'
-    };
-    document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
-    
-    if (pageName === 'dashboard') atualizarDashboard();
-    if (pageName === 'faturamento') renderizarCanais();
-    if (pageName === 'dre') atualizarDRE();
-    if (pageName === 'crm') renderizarKanban();
-    if (pageName === 'clientes') renderizarClientes();
-    if (pageName === 'transportadoras') renderizarTransportadoras();
-    if (pageName === 'pedidos') renderizarPedidosMes();
-    if (pageName === 'acoes') renderizarAcoes();
-    if (pageName === 'configuracoes') carregarDadosEmpresa();
-    if (pageName === 'empresas') renderizarEmpresas();
-    if (pageName === 'usuarios') {
-        carregarFiltrosUsuarios();
-        renderizarUsuarios();
-    }
-}
-
-// ==========================================
-// SALVAR/CARREGAR COM MULTI-EMPRESA
-// ==========================================
-
-async function salvarDados() {
-    try {
-        const dados = {
-            // Dados existentes
-            canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
-            etapasPipeline, negocios, proximoIdNegocio,
-            pedidos, proximoIdPedido, acoes, proximoIdAcao,
-            metaMensal, tarefasDia, proximoIdTarefa,
-            vendasFechadasRegistro, proximoIdVenda,
-            pedidosEnviadosRegistro, proximoIdPedidoEnviado,
-            dadosEmpresa, transportadoras, proximoIdTransportadora,
-            
-            // Novos dados multi-empresa
-            empresas, proximoIdEmpresa,
-            usuarios, proximoIdUsuario,
-            
-            ultimaAtualizacao: new Date().toISOString()
-        };
-        
-        await db.collection('empresas').doc('minha-empresa').set(dados);
-        localStorage.setItem('sistemaGestao', JSON.stringify(dados));
-        console.log('💾 Salvo no Firebase e localmente!');
-    } catch(error) {
-        console.error('Erro Firebase:', error);
-        try {
-            const dados = {
-                canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
-                etapasPipeline, negocios, proximoIdNegocio,
-                pedidos, proximoIdPedido, acoes, proximoIdAcao,
-                metaMensal, tarefasDia, proximoIdTarefa,
-                vendasFechadasRegistro, proximoIdVenda,
-                pedidosEnviadosRegistro, proximoIdPedidoEnviado,
-                dadosEmpresa, transportadoras, proximoIdTransportadora,
-                empresas, proximoIdEmpresa,
-                usuarios, proximoIdUsuario,
-            };
-            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
-            console.log('💾 Salvo localmente');
-        } catch(e) { console.log('Erro salvar'); }
-    }
-}
-
-async function carregarDados() {
-    try {
-        const doc = await db.collection('empresas').doc('minha-empresa').get();
-        
-        if (doc.exists) {
-            const dados = doc.data();
-            
-            // Dados existentes
-            canaisVenda = dados.canaisVenda || [];
-            proximoIdCanal = dados.proximoIdCanal || 1;
-            gastos = dados.gastos || [];
-            proximoIdGasto = dados.proximoIdGasto || 1;
-            etapasPipeline = dados.etapasPipeline || etapasPipeline;
-            negocios = dados.negocios || [];
-            proximoIdNegocio = dados.proximoIdNegocio || 1;
-            pedidos = dados.pedidos || [];
-            proximoIdPedido = dados.proximoIdPedido || 1;
-            acoes = dados.acoes || [];
-            proximoIdAcao = dados.proximoIdAcao || 1;
-            metaMensal = dados.metaMensal || 0;
-            tarefasDia = dados.tarefasDia || [];
-            proximoIdTarefa = dados.proximoIdTarefa || 1;
-            vendasFechadasRegistro = dados.vendasFechadasRegistro || [];
-            proximoIdVenda = dados.proximoIdVenda || 1;
-            pedidosEnviadosRegistro = dados.pedidosEnviadosRegistro || [];
-            proximoIdPedidoEnviado = dados.proximoIdPedidoEnviado || 1;
-            dadosEmpresa = dados.dadosEmpresa || dadosEmpresa;
-            transportadoras = dados.transportadoras || [];
-            proximoIdTransportadora = dados.proximoIdTransportadora || 1;
-            
-            // Novos dados multi-empresa
-            empresas = dados.empresas || [];
-            proximoIdEmpresa = dados.proximoIdEmpresa || 1;
-            usuarios = dados.usuarios || [];
-            proximoIdUsuario = dados.proximoIdUsuario || 1;
-            
-            console.log('☁️ Carregado do Firebase!');
-            localStorage.setItem('sistemaGestao', JSON.stringify(dados));
-        } else {
-            carregarDadosLocal();
-        }
-    } catch(error) {
-        console.error('Erro Firebase:', error);
-        carregarDadosLocal();
-    }
-}
-
-function carregarDadosLocal() {
-    try {
-        const dados = localStorage.getItem('sistemaGestao');
-        if (dados) {
-            const p = JSON.parse(dados);
-            
-            canaisVenda = p.canaisVenda || [];
-            proximoIdCanal = p.proximoIdCanal || 1;
-            gastos = p.gastos || [];
-            proximoIdGasto = p.proximoIdGasto || 1;
-            etapasPipeline = p.etapasPipeline || etapasPipeline;
-            negocios = p.negocios || [];
-            proximoIdNegocio = p.proximoIdNegocio || 1;
-            pedidos = p.pedidos || [];
-            proximoIdPedido = p.proximoIdPedido || 1;
-            acoes = p.acoes || [];
-            proximoIdAcao = p.proximoIdAcao || 1;
-            metaMensal = p.metaMensal || 0;
-            tarefasDia = p.tarefasDia || [];
-            proximoIdTarefa = p.proximoIdTarefa || 1;
-            vendasFechadasRegistro = p.vendasFechadasRegistro || [];
-            proximoIdVenda = p.proximoIdVenda || 1;
-            pedidosEnviadosRegistro = p.pedidosEnviadosRegistro || [];
-            proximoIdPedidoEnviado = p.proximoIdPedidoEnviado || 1;
-            dadosEmpresa = p.dadosEmpresa || dadosEmpresa;
-            transportadoras = p.transportadoras || [];
-            proximoIdTransportadora = p.proximoIdTransportadora || 1;
-            
-            empresas = p.empresas || [];
-            proximoIdEmpresa = p.proximoIdEmpresa || 1;
-            usuarios = p.usuarios || [];
-            proximoIdUsuario = p.proximoIdUsuario || 1;
-            
-            console.log('💾 Carregado localmente!');
-        }
-    } catch(e) { console.log('Erro carregar'); }
-}
-
-// BACKUP MANUAL (ATUALIZADO)
-function exportarBackup() {
-    const backup = {
-        data: new Date().toISOString(),
-        versao: '3.0-multiempresa',
-        dados: {
-            canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
-            etapasPipeline, negocios, proximoIdNegocio,
-            pedidos, proximoIdPedido, acoes, proximoIdAcao,
-            metaMensal, tarefasDia, proximoIdTarefa,
-            vendasFechadasRegistro, proximoIdVenda,
-            pedidosEnviadosRegistro, proximoIdPedidoEnviado,
-            dadosEmpresa, transportadoras, proximoIdTransportadora,
-            empresas, proximoIdEmpresa,
-            usuarios, proximoIdUsuario
-        }
-    };
-    
-    const dataStr = JSON.stringify(backup, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'backup-gestao-multiempresa-' + new Date().toISOString().split('T')[0] + '.json';
-    link.click();
-    alert('✅ Backup realizado com Multi-empresa!');
-}
-
-function importarBackup() {
-    if (!confirm('⚠️ Substituir dados atuais?')) return;
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const backup = JSON.parse(e.target.result);
-                const d = backup.dados;
-                
-                canaisVenda = d.canaisVenda || [];
-                proximoIdCanal = d.proximoIdCanal || 1;
-                gastos = d.gastos || [];
-                proximoIdGasto = d.proximoIdGasto || 1;
-                etapasPipeline = d.etapasPipeline || etapasPipeline;
-                negocios = d.negocios || [];
-                proximoIdNegocio = d.proximoIdNegocio || 1;
-                pedidos = d.pedidos || [];
-                proximoIdPedido = d.proximoIdPedido || 1;
-                acoes = d.acoes || [];
-                proximoIdAcao = d.proximoIdAcao || 1;
-                metaMensal = d.metaMensal || 0;
-                tarefasDia = d.tarefasDia || [];
-                proximoIdTarefa = d.proximoIdTarefa || 1;
-                vendasFechadasRegistro = d.vendasFechadasRegistro || [];
-                proximoIdVenda = d.proximoIdVenda || 1;
-                pedidosEnviadosRegistro = d.pedidosEnviadosRegistro || [];
-                proximoIdPedidoEnviado = d.proximoIdPedidoEnviado || 1;
-                dadosEmpresa = d.dadosEmpresa || dadosEmpresa;
-                transportadoras = d.transportadoras || [];
-                proximoIdTransportadora = d.proximoIdTransportadora || 1;
-                empresas = d.empresas || [];
-                proximoIdEmpresa = d.proximoIdEmpresa || 1;
-                usuarios = d.usuarios || [];
-                proximoIdUsuario = d.proximoIdUsuario || 1;
-                
-                salvarDados();
-                location.reload();
-            } catch (error) {
-                alert('❌ Arquivo inválido!');
-            }
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-}
-
-// ==========================================
-// DASHBOARD (FUNÇÕES EXISTENTES)
+// DASHBOARD
 // ==========================================
 
 function atualizarDashboard() {
@@ -2736,7 +2834,7 @@ function excluirTarefa(tarefaId) {
 }
 
 // ==========================================
-// FATURAMENTO (FUNÇÕES EXISTENTES)
+// FATURAMENTO
 // ==========================================
 
 function renderizarCanais() {
@@ -2831,7 +2929,7 @@ function salvarVenda(event) {
 }
 
 // ==========================================
-// DRE (FUNÇÕES EXISTENTES)
+// DRE
 // ==========================================
 
 function atualizarDRE() {
@@ -2908,7 +3006,7 @@ function excluirGasto(id) {
 }
 
 // ==========================================
-// CRM (FUNÇÕES EXISTENTES)
+// CRM
 // ==========================================
 
 function renderizarKanban() {
@@ -3002,13 +3100,11 @@ function soltarCard(event, novaEtapaId) {
                         valor: novaVenda.valor,
                         descricao: novaVenda.titulo + ' - ' + novaVenda.cliente
                     });
-                    alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n📊 Canal: ' + canal.nome);
+                    alert('✅ VENDA REGISTRADA!\n\n💰 R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📊 Canal: ' + canal.nome);
                 }
             } else {
-                alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR'));
+                alert('✅ VENDA REGISTRADA!\n\n💰 R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
             }
-        } else {
-            alert('ℹ️ Venda já registrada em ' + new Date(jaRegistrado.dataFechamento).toLocaleDateString('pt-BR'));
         }
     }
 
@@ -3040,9 +3136,7 @@ function soltarCard(event, novaEtapaId) {
             
             pedidosEnviadosRegistro.push(novoPedido);
             
-            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
-        } else {
-            alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
+            alert('📦 PEDIDO REGISTRADO!\n\n✅ ' + negocio.cliente + '\n💰 R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
         }
     }
 
@@ -3094,7 +3188,7 @@ function salvarNovoNegocio(event) {
     document.getElementById('negocioCanal').value = '';
     
     salvarDados();
-    alert('✅ Negócio criado em "Lead"!');
+    alert('✅ Negócio criado!');
 }
 
 function abrirModalEditarNegocioCompleto(negocioId) {
@@ -3144,7 +3238,7 @@ function excluirNegocioDireto(negocioId) {
     const negocio = negocios.find(n => n.id === negocioId);
     if (!negocio) return;
     
-    if (confirm('Excluir negócio?\n\nCliente: ' + negocio.cliente + '\nValor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}))) {
+    if (confirm('Excluir negócio?\n\nCliente: ' + negocio.cliente)) {
         negocios = negocios.filter(n => n.id !== negocioId);
         renderizarKanban();
         salvarDados();
@@ -3185,7 +3279,7 @@ function renderizarListaColunas() {
                     <div style="width: 40px; height: 40px; background: ${e.cor}; border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">${i+1}</div>
                     <div>
                         <h4 style="font-weight: 600;">${e.nome} ${e.fixo ? '🔒' : ''}</h4>
-                        <p style="font-size: 13px; color: #6b7280;">${count} negócio(s) ${e.fixo ? '• <strong style="color: #dc2626;">FIXA</strong>' : ''}</p>
+                        <p style="font-size: 13px; color: #6b7280;">${count} negócio(s)</p>
                     </div>
                 </div>
                 ${!e.fixo ? `
@@ -3221,23 +3315,16 @@ function salvarNovaColuna(event) {
 
 function excluirColunaLivre(etapaId) {
     const etapa = etapasPipeline.find(e => e.id === etapaId);
-    if (!etapa) return;
-
-    if (etapa.fixo) {
-        alert('🔒 Esta coluna não pode ser excluída!\n\n"' + etapa.nome + '" é essencial para o faturamento.');
+    if (!etapa || etapa.fixo) {
+        alert('🔒 Esta coluna é protegida!');
         return;
     }
 
     const negociosNaColuna = negocios.filter(n => n.etapaId === etapaId);
     
-    let msg = 'Excluir coluna "' + etapa.nome + '"?';
-    if (negociosNaColuna.length > 0) {
-        msg += '\n\n⚠️ ' + negociosNaColuna.length + ' negócio(s) será(ão) movido(s) para "Lead"';
-    }
-
-    if (confirm(msg)) {
+    if (confirm('Excluir coluna "' + etapa.nome + '"?\n\n' + negociosNaColuna.length + ' negócio(s) será(ão) movido(s) para "Lead"')) {
         if (negociosNaColuna.length > 0) {
-            const colunaLead = etapasPipeline.find(e => e.nome === 'Lead') || etapasPipeline[0];
+            const colunaLead = etapasPipeline[0];
             negociosNaColuna.forEach(n => n.etapaId = colunaLead.id);
         }
 
@@ -3271,7 +3358,7 @@ function obterNomeTransportadora(pedido) {
 }
 
 // ==========================================
-// PEDIDOS (FUNÇÕES EXISTENTES)
+// PEDIDOS
 // ==========================================
 
 function renderizarPedidosMes() {
@@ -3435,7 +3522,7 @@ function salvarEdicaoPedidoEnviado(event) {
 }
 
 // ==========================================
-// AÇÕES (FUNÇÕES EXISTENTES)
+// AÇÕES
 // ==========================================
 
 function renderizarAcoes() {
@@ -3491,7 +3578,7 @@ function excluirAcao(id) {
 }
 
 // ==========================================
-// CLIENTES (FUNÇÕES EXISTENTES)
+// CLIENTES
 // ==========================================
 
 function gerarListaClientes() {
@@ -3594,14 +3681,12 @@ function renderizarClientes() {
         const qtdNegocios = cliente.negocios.length;
         const ticketMedio = qtdNegocios > 0 ? cliente.valorTotal / qtdNegocios : 0;
         
-        let statusCliente = 'inativo';
         let corStatus = '#6b7280';
         let labelStatus = 'Inativo';
         
         if (cliente.ultimaCompra) {
             const diasDesdeCompra = (hoje - new Date(cliente.ultimaCompra)) / (1000 * 60 * 60 * 24);
             if (diasDesdeCompra <= diasInativo) {
-                statusCliente = 'ativo';
                 corStatus = '#16a34a';
                 labelStatus = 'Ativo';
             }
@@ -3622,14 +3707,14 @@ function renderizarClientes() {
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <h3 style="font-size: 18px; font-weight: 600;">${cliente.nome}</h3>
-                                    <span style="background: ${corStatus}20; color: ${corStatus}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <span style="background: $${corStatus}20; color: $${corStatus}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                                         ${labelStatus}
                                     </span>
                                     ${isVIP ? '<span style="background: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">⭐ VIP</span>' : ''}
                                 </div>
                                 <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
-                                    ${cliente.telefone ? `<span><i class="fas fa-phone"></i> ${cliente.telefone}</span>` : ''}
-                                    ${cliente.email ? `<span><i class="fas fa-envelope"></i> ${cliente.email}</span>` : ''}
+                                    $${cliente.telefone ? `<span><i class="fas fa-phone"></i> $${cliente.telefone}</span>` : ''}
+                                    $${cliente.email ? `<span><i class="fas fa-envelope"></i> $${cliente.email}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -3637,7 +3722,7 @@ function renderizarClientes() {
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">💰 Valor Total</p>
-                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$$ $${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🛒 Negócios</p>
@@ -3645,7 +3730,7 @@ function renderizarClientes() {
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📊 Ticket Médio</p>
-                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$$ $${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📅 Última Compra</p>
@@ -3656,12 +3741,12 @@ function renderizarClientes() {
 
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
                         ${cliente.telefone ? `
-                            <button onclick="abrirWhatsAppDireto('${cliente.telefone}', '${cliente.nome}')" class="btn" style="background: #25D366; color: white; padding: 8px 16px;">
+                            <button onclick="abrirWhatsAppDireto('$${cliente.telefone}', '$${cliente.nome}')" class="btn" style="background: #25D366; color: white; padding: 8px 16px;">
                                 <i class="fab fa-whatsapp"></i>
                             </button>
                         ` : ''}
                         ${cliente.email ? `
-                            <button onclick="abrirEmailCliente('${cliente.email}', '${cliente.nome}')" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                            <button onclick="abrirEmailCliente('$${cliente.email}', '$${cliente.nome}')" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
                                 <i class="fas fa-envelope"></i>
                             </button>
                         ` : ''}
@@ -3728,7 +3813,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total Gasto</p>
-                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$$ $${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total de Negócios</p>
@@ -3736,7 +3821,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Ticket Médio</p>
-                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$$ $${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
             </div>
         </div>
     `;
@@ -3753,7 +3838,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             <div style="border-left: 4px solid ${etapaCor}; background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <h4 style="font-size: 16px; font-weight: 600;">${n.titulo}</h4>
-                    <span style="background: ${etapaCor}20; color: ${etapaCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                    <span style="background: $${etapaCor}20; color: $${etapaCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                         ${etapaNome}
                     </span>
                 </div>
@@ -3762,7 +3847,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
                         <i class="fas fa-calendar"></i> ${new Date(n.data).toLocaleDateString('pt-BR')}
                     </p>
                     <p style="font-size: 18px; font-weight: bold; color: #16a34a;">
-                        R$ ${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        R$$ $${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                     </p>
                 </div>
             </div>
@@ -3818,10 +3903,7 @@ function exportarClientes() {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(dadosExcel);
 
-    const wscols = [
-        {wch: 30}, {wch: 20}, {wch: 30}, {wch: 18},
-        {wch: 20}, {wch: 20}, {wch: 18}, {wch: 12}
-    ];
+    const wscols = [{wch: 30}, {wch: 20}, {wch: 30}, {wch: 18}, {wch: 20}, {wch: 20}, {wch: 18}, {wch: 12}];
     ws['!cols'] = wscols;
 
     XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
@@ -3837,11 +3919,11 @@ function exportarClientes() {
     const nomeArquivo = 'clientes-' + new Date().toISOString().split('T')[0] + '.xlsx';
     XLSX.writeFile(wb, nomeArquivo);
 
-    alert('✅ Lista de clientes exportada em Excel!');
+    alert('✅ Clientes exportados!');
 }
 
 // ==========================================
-// TRANSPORTADORAS (FUNÇÕES EXISTENTES)
+// TRANSPORTADORAS
 // ==========================================
 
 function renderizarTransportadoras() {
@@ -3874,31 +3956,27 @@ function renderizarTransportadoras() {
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <h3 style="font-size: 18px; font-weight: 600;">${t.nome}</h3>
-                                    <span style="background: ${statusCor}20; color: ${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <span style="background: $${statusCor}20; color: $${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                                         ${statusLabel}
                                     </span>
                                 </div>
                                 <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
-                                    ${t.telefone ? `<span><i class="fas fa-phone"></i> ${t.telefone}</span>` : ''}
-                                    ${t.email ? `<span><i class="fas fa-envelope"></i> ${t.email}</span>` : ''}
+                                    $${t.telefone ? `<span><i class="fas fa-phone"></i> $${t.telefone}</span>` : ''}
+                                    $${t.email ? `<span><i class="fas fa-envelope"></i> $${t.email}</span>` : ''}
                                 </div>
                             </div>
                         </div>
 
                         <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🔗 Link de Rastreamento:</p>
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🔗 Link:</p>
                             <p style="font-size: 14px; font-family: monospace; word-break: break-all;">${t.linkRastreamento}</p>
                         </div>
 
-                        ${t.cnpj ? `
-                            <div style="font-size: 14px; color: #6b7280;">
-                                <i class="fas fa-file-alt"></i> CNPJ: ${t.cnpj}
-                            </div>
-                        ` : ''}
+                        $${t.cnpj ? `<div style="font-size: 14px; color: #6b7280;"><i class="fas fa-file-alt"></i> CNPJ: $${t.cnpj}</div>` : ''}
 
                         <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-top: 12px;">
                             <p style="font-size: 14px; color: #1e40af;">
-                                📦 <strong>${pedidosUsando}</strong> pedido(s) usando esta transportadora
+                                📦 <strong>${pedidosUsando}</strong> pedido(s) usando
                             </p>
                         </div>
                     </div>
@@ -4000,11 +4078,11 @@ function excluirTransportadora(id) {
     const pedidosUsando = pedidosEnviadosRegistro.filter(p => p.transportadoraId === id).length;
 
     if (pedidosUsando > 0) {
-        alert('❌ Não é possível excluir!\n\n' + pedidosUsando + ' pedido(s) está(ão) usando esta transportadora.');
+        alert('❌ Não é possível excluir!\n\n' + pedidosUsando + ' pedido(s) usando esta transportadora.');
         return;
     }
 
-    if (confirm('Excluir transportadora "' + t.nome + '"?')) {
+    if (confirm('Excluir "' + t.nome + '"?')) {
         transportadoras = transportadoras.filter(x => x.id !== id);
         renderizarTransportadoras();
         salvarDados();
@@ -4013,7 +4091,7 @@ function excluirTransportadora(id) {
 }
 
 // ==========================================
-// CONFIGURAÇÕES EMPRESA (FUNÇÕES EXISTENTES)
+// CONFIGURAÇÕES EMPRESA
 // ==========================================
 
 function carregarDadosEmpresa() {
@@ -4046,7 +4124,7 @@ function salvarDadosEmpresa(event) {
         inscricaoEstadual: document.getElementById('inscricaoEstadual').value,
         inscricaoMunicipal: document.getElementById('inscricaoMunicipal').value,
         endereco: document.getElementById('enderecoEmpresa').value,
-        telefone: document.getElementById('telefoneEmpresa').value,
+telefone: document.getElementById('telefoneEmpresa').value,
         celular: document.getElementById('celularEmpresa').value,
         email: document.getElementById('emailEmpresa').value,
         nomeResponsavel: document.getElementById('nomeResponsavel').value,
@@ -4061,7 +4139,7 @@ function salvarDadosEmpresa(event) {
 
     atualizarResumoEmpresa();
     salvarDados();
-    alert('✅ Dados da empresa salvos com sucesso!');
+    alert('✅ Dados salvos!');
 }
 
 function atualizarResumoEmpresa() {
@@ -4070,15 +4148,10 @@ function atualizarResumoEmpresa() {
 
     document.getElementById('nomeEmpresaResumo').textContent = nomeExibir;
     document.getElementById('cnpjEmpresaResumo').textContent = cnpjExibir;
-
-    const logoText = document.querySelector('.sidebar h2');
-    if (logoText && dadosEmpresa.nome) {
-        logoText.textContent = dadosEmpresa.nome;
-    }
 }
 
 function limparFormularioEmpresa() {
-    if (confirm('Limpar todos os campos do formulário?')) {
+    if (confirm('Limpar todos os campos?')) {
         document.getElementById('nomeEmpresa').value = '';
         document.getElementById('cnpjEmpresa').value = '';
         document.getElementById('inscricaoEstadual').value = '';
@@ -4105,10 +4178,15 @@ function limparFormularioEmpresa() {
 window.addEventListener('load', async function() {
     await carregarDados();
     verificarAutenticacao();
-    console.log('✅ Sistema Multi-empresa carregado com sucesso!');
+    console.log('✅ Sistema Multi-empresa com isolamento carregado!');
 });
 
-setInterval(salvarDados, 30000);
+setInterval(function() {
+    if (empresaAtual) {
+        salvarContextoEmpresa();
+    }
+    salvarDados();
+}, 30000);
 
 setInterval(function() {
     if (!document.getElementById('page-dashboard').classList.contains('hidden')) {
