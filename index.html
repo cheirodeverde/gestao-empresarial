@@ -43,68 +43,81 @@
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
+<!-- TELA DE LOGIN MULTI-EMPRESA -->
 <div id="telaLogin" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; z-index: 99999;">
-    <div style="background: white; border-radius: 16px; padding: 40px; max-width: 400px; width: 90%;">
+    <div style="background: white; border-radius: 16px; padding: 40px; max-width: 450px; width: 90%;">
         <div style="text-align: center; margin-bottom: 32px;">
             <div style="width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                 <i class="fas fa-lock" style="font-size: 36px; color: white;"></i>
             </div>
-            <h2 style="font-size: 24px; font-weight: bold;">Acesso Restrito</h2>
+            <h2 style="font-size: 24px; font-weight: bold;">Sistema de Gestão</h2>
+            <p style="color: #6b7280; font-size: 14px; margin-top: 8px;">Acesso Multi-empresa</p>
         </div>
-        <form onsubmit="fazerLogin(event)">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Senha</label>
-                <input type="password" id="senhaLogin" required autofocus style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        
+        <form onsubmit="fazerLoginMultiempresa(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;">
+                    <i class="fas fa-user"></i> Login / Email
+                </label>
+                <input type="text" id="loginUsuario" required autofocus style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Digite seu login ou email">
             </div>
-            <div id="erroLogin" class="hidden" style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">❌ Senha incorreta!</div>
-            <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Entrar</button>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;">
+                    <i class="fas fa-lock"></i> Senha
+                </label>
+                <input type="password" id="senhaUsuario" required style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Digite sua senha">
+            </div>
+            
+            <div id="erroLogin" class="hidden" style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; font-size: 14px;">
+                <i class="fas fa-exclamation-circle"></i> <span id="mensagemErroLogin">Usuário ou senha incorretos!</span>
+            </div>
+            
+            <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
         </form>
+        
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 12px; color: #6b7280;">
+                <i class="fas fa-info-circle"></i> Primeiro acesso? Entre como <strong>admin</strong>
+            </p>
+        </div>
     </div>
 </div>
 
-<!-- SIDEBAR -->
+<!-- SIDEBAR DINÂMICA -->
 <div class="sidebar">
     <div style="padding: 20px; border-bottom: 1px solid #374151;">
-        <h2 style="font-size: 20px; font-weight: bold;">Minha Empresa</h2>
+        <h2 id="nomeEmpresaSidebar" style="font-size: 20px; font-weight: bold;">Minha Empresa</h2>
+        <p id="usuarioLogadoInfo" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Usuário não identificado</p>
     </div>
-    <nav style="padding: 20px 0;">
-        <div class="menu-item active" onclick="irParaPagina('dashboard')">
-            <i class="fas fa-chart-line" style="width: 20px;"></i><span>Dashboard</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('faturamento')">
-            <i class="fas fa-dollar-sign" style="width: 20px;"></i><span>Canais de Venda</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('dre')">
-            <i class="fas fa-file-invoice" style="width: 20px;"></i><span>DRE</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('crm')">
-            <i class="fas fa-users" style="width: 20px;"></i><span>CRM</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('clientes')">
-            <i class="fas fa-address-book" style="width: 20px;"></i><span>Clientes</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('transportadoras')">
-            <i class="fas fa-truck" style="width: 20px;"></i><span>Transportadoras</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('pedidos')">
-            <i class="fas fa-box" style="width: 20px;"></i><span>Pedidos Enviados</span>
-        </div>
-        <div class="menu-item" onclick="irParaPagina('acoes')">
-            <i class="fas fa-bullseye" style="width: 20px;"></i><span>Ações</span>
-        </div>
+    <nav id="menuNavegacao" style="padding: 20px 0;">
+        <!-- Menu será carregado dinamicamente -->
     </nav>
     <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
-        <div class="menu-item" onclick="irParaPagina('configuracoes')">
+        <!-- Menu Administração (apenas para Super Admin) -->
+        <div id="menuAdministracao" class="hidden">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; padding: 0 20px;">Administração</p>
+            <div class="menu-item" onclick="irParaPagina('empresas')">
+                <i class="fas fa-building" style="width: 20px;"></i><span>Empresas</span>
+            </div>
+            <div class="menu-item" onclick="irParaPagina('usuarios')">
+                <i class="fas fa-users-cog" style="width: 20px;"></i><span>Usuários</span>
+            </div>
+        </div>
+        
+        <!-- Configurações da Empresa Atual -->
+        <div id="menuConfiguracoes" class="menu-item" onclick="irParaPagina('configuracoes')">
             <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
         </div>
+        
         <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
             <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
         </div>
     </div>
 </div>
 
-<!-- HEADER -->
 <div class="main-content">
     <header style="background: white; padding: 20px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -125,7 +138,8 @@
             </div>
         </div>
     </header>
-<div style="padding: 40px;">
+    
+    <div style="padding: 40px;">
 
 <!-- DASHBOARD -->
         <div id="page-dashboard" class="page-content">
@@ -256,6 +270,7 @@
             </div>
             <div id="kanbanBoard" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px;"></div>
         </div>
+
 <!-- CLIENTES -->
         <div id="page-clientes" class="page-content hidden">
             <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
@@ -524,12 +539,79 @@
             </div>
         </div>
 
+<!-- PÁGINA: EMPRESAS (NOVA) -->
+        <div id="page-empresas" class="page-content hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <div>
+                    <h2 style="font-size: 24px; font-weight: bold;">Gestão de Empresas</h2>
+                    <p style="color: #6b7280; margin-top: 4px;">Cadastre e gerencie as empresas do sistema</p>
+                </div>
+                <button onclick="abrirModalNovaEmpresa()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nova Empresa
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px;">
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Total de Empresas</p>
+                    <p id="totalEmpresas" style="font-size: 28px; font-weight: bold;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Empresas Ativas</p>
+                    <p id="empresasAtivas" style="font-size: 28px; font-weight: bold; color: #16a34a;">0</p>
+                </div>
+                <div class="metric-card">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 4px;">Total de Usuários</p>
+                    <p id="totalUsuariosSistema" style="font-size: 28px; font-weight: bold; color: #3b82f6;">0</p>
+                </div>
+            </div>
+
+            <div id="listaEmpresas"></div>
+
+            <div id="mensagemSemEmpresas" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
+                <i class="fas fa-building" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Nenhuma empresa cadastrada</p>
+                <p style="font-size: 14px;">Clique em "Nova Empresa" para começar</p>
+            </div>
+        </div>
+
+<!-- PÁGINA: USUÁRIOS (NOVA) -->
+        <div id="page-usuarios" class="page-content hidden">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <div>
+                    <h2 style="font-size: 24px; font-weight: bold;">Gestão de Usuários</h2>
+                    <p style="color: #6b7280; margin-top: 4px;">Cadastre e gerencie os usuários do sistema</p>
+                </div>
+                <button onclick="abrirModalNovoUsuario()" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Novo Usuário
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                <select id="filtroEmpresaUsuarios" onchange="renderizarUsuarios()" style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; min-width: 200px;">
+                    <option value="todas">Todas as Empresas</option>
+                </select>
+                <select id="filtroStatusUsuarios" onchange="renderizarUsuarios()" style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <option value="todos">Todos os Status</option>
+                    <option value="ativos">Ativos</option>
+                    <option value="inativos">Inativos</option>
+                </select>
+            </div>
+
+            <div id="listaUsuarios"></div>
+
+            <div id="mensagemSemUsuarios" class="hidden" style="text-align: center; padding: 80px; color: #6b7280;">
+                <i class="fas fa-users" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Nenhum usuário cadastrado</p>
+                <p style="font-size: 14px;">Clique em "Novo Usuário" para começar</p>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<!-- MODAIS -->
+<!-- MODAIS EXISTENTES -->
 
-<!-- Modal: Novo Canal -->
 <div id="modalNovoCanal" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Canal</h3>
@@ -562,7 +644,6 @@
     </div>
 </div>
 
-<!-- Modal: Lançar Venda -->
 <div id="modalLancarVenda" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Lançar Venda</h3>
@@ -588,7 +669,6 @@
     </div>
 </div>
 
-<!-- Modal: Novo Gasto -->
 <div id="modalNovoGasto" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Gasto</h3>
@@ -625,7 +705,6 @@
     </div>
 </div>
 
-<!-- Modal: Novo Negócio -->
 <div id="modalNovoNegocio" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Novo Negócio</h3>
@@ -664,7 +743,6 @@
     </div>
 </div>
 
-<!-- Modal: Editar Negócio Completo -->
 <div id="modalEditarNegocioCompleto" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -711,7 +789,6 @@
     </div>
 </div>
 
-<!-- Modal: Gerenciar Colunas -->
 <div id="modalGerenciarColunas" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 700px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -742,7 +819,6 @@
     </div>
 </div>
 
-<!-- Modal: Configurar Meta -->
 <div id="modalConfigurarMeta" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">🎯 Configurar Meta</h3>
@@ -762,7 +838,6 @@
     </div>
 </div>
 
-<!-- Modal: Nova Tarefa -->
 <div id="modalNovaTarefa" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 500px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Tarefa</h3>
@@ -787,7 +862,6 @@
     </div>
 </div>
 
-<!-- Modal: Nova Ação -->
 <div id="modalNovaAcao" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Nova Ação</h3>
@@ -820,7 +894,6 @@
     </div>
 </div>
 
-<!-- Modal: Editar Pedido Enviado -->
 <div id="modalEditarPedidoEnviado" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -861,7 +934,6 @@
     </div>
 </div>
 
-<!-- Modal: Histórico do Cliente (✅ SEM DUPLICATA) -->
 <div id="modalHistoricoCliente" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 800px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -874,7 +946,6 @@
     </div>
 </div>
 
-<!-- Modal: Nova/Editar Transportadora -->
 <div id="modalTransportadora" class="modal-overlay hidden">
     <div class="modal-content" style="max-width: 600px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
@@ -937,6 +1008,221 @@
     </div>
 </div>
 
+<!-- MODAL: CADASTRO/EDIÇÃO DE EMPRESA -->
+<div id="modalEmpresa" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 900px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 id="tituloModalEmpresa" style="font-size: 20px; font-weight: bold;">Nova Empresa</h3>
+            <button type="button" onclick="fecharModalEmpresa()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+
+        <!-- Abas -->
+        <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb;">
+            <button id="abaEmpresaDados" onclick="trocarAbaEmpresa('dados')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #3b82f6; border-bottom: 3px solid #3b82f6;">
+                <i class="fas fa-building"></i> Dados da Empresa
+            </button>
+            <button id="abaEmpresaModulos" onclick="trocarAbaEmpresa('modulos')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent;">
+                <i class="fas fa-th-large"></i> Módulos Liberados
+            </button>
+        </div>
+
+        <form onsubmit="salvarEmpresa(event)">
+            <input type="hidden" id="empresaId">
+
+            <!-- ABA: DADOS DA EMPRESA -->
+            <div id="abaEmpresaDadosConteudo">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏢 Razão Social *</label>
+                        <input type="text" id="empresaRazaoSocial" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: Empresa ABC Ltda">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📄 CNPJ *</label>
+                        <input type="text" id="empresaCNPJ" required maxlength="18" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="00.000.000/0000-00">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏪 Nome Fantasia</label>
+                    <input type="text" id="empresaNomeFantasia" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: ABC Comércio">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📍 Endereço</label>
+                        <input type="text" id="empresaEndereco" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Rua, Avenida...">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔢 Número</label>
+                        <input type="text" id="empresaNumero" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="123">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏘️ Bairro</label>
+                        <input type="text" id="empresaBairro" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Centro">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🌆 Cidade</label>
+                        <input type="text" id="empresaCidade" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="São Paulo">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📌 Estado (UF)</label>
+                        <select id="empresaEstado" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <option value="">Selecione</option>
+                            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
+                            <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
+                            <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+                            <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option>
+                            <option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option>
+                            <option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+                            <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📧 Email</label>
+                        <input type="email" id="empresaEmail" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="contato@empresa.com">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📞 Telefone</label>
+                        <input type="tel" id="empresaTelefone" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 0000-0000">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="empresaAtiva" checked style="width: 20px; height: 20px;">
+                        <span style="font-weight: 600;">✅ Empresa Ativa</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ABA: MÓDULOS LIBERADOS -->
+            <div id="abaEmpresaModulosConteudo" class="hidden">
+                <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="color: #1e40af; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> <strong>Selecione os módulos que estarão disponíveis para esta empresa.</strong>
+                        Os usuários da empresa poderão acessar apenas os módulos liberados aqui.
+                    </p>
+                </div>
+
+                <div id="listaModulosEmpresa" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                    <!-- Módulos serão carregados dinamicamente -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 24px;">
+                <button type="button" onclick="fecharModalEmpresa()" class="btn" style="background: #e5e7eb;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Empresa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: CADASTRO/EDIÇÃO DE USUÁRIO -->
+<div id="modalUsuario" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 900px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+            <h3 id="tituloModalUsuario" style="font-size: 20px; font-weight: bold;">Novo Usuário</h3>
+            <button type="button" onclick="fecharModalUsuario()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+
+        <!-- Abas -->
+        <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb;">
+            <button id="abaUsuarioDados" onclick="trocarAbaUsuario('dados')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #3b82f6; border-bottom: 3px solid #3b82f6;">
+                <i class="fas fa-user"></i> Dados do Usuário
+            </button>
+            <button id="abaUsuarioPermissoes" onclick="trocarAbaUsuario('permissoes')" type="button" style="padding: 12px 24px; border: none; background: none; cursor: pointer; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent;">
+                <i class="fas fa-lock"></i> Permissões
+            </button>
+        </div>
+
+        <form onsubmit="salvarUsuario(event)">
+            <input type="hidden" id="usuarioId">
+
+            <!-- ABA: DADOS DO USUÁRIO -->
+            <div id="abaUsuarioDadosConteudo">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">🏢 Empresa *</label>
+                    <select id="usuarioEmpresaId" required onchange="carregarModulosEmpresaUsuario()" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <option value="">Selecione uma empresa</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">👤 Nome Completo *</label>
+                    <input type="text" id="usuarioNome" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Ex: João da Silva">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📧 Email *</label>
+                        <input type="email" id="usuarioEmail" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="usuario@email.com">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">📱 Telefone</label>
+                        <input type="tel" id="usuarioTelefone" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 00000-0000">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔑 Login *</label>
+                        <input type="text" id="usuarioLogin" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="usuario.login">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔒 Senha *</label>
+                        <input type="password" id="usuarioSenha" required minlength="6" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="Mínimo 6 caracteres">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="usuarioAtivo" checked style="width: 20px; height: 20px;">
+                        <span style="font-weight: 600;">✅ Usuário Ativo</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ABA: PERMISSÕES -->
+            <div id="abaUsuarioPermissoesConteudo" class="hidden">
+                <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="color: #1e40af; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> <strong>Defina as permissões de acesso aos módulos.</strong>
+                        <br>Apenas módulos liberados para a empresa estarão disponíveis aqui.
+                    </p>
+                </div>
+
+                <div id="mensagemSelecioneEmpresa" style="text-align: center; padding: 40px; color: #6b7280;">
+                    <i class="fas fa-building" style="font-size: 48px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+                    <p style="font-size: 16px; font-weight: 600;">Selecione uma empresa primeiro</p>
+                </div>
+
+                <div id="listaPermissoesUsuario" class="hidden">
+                    <!-- Permissões serão carregadas dinamicamente -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 24px;">
+                <button type="button" onclick="fecharModalUsuario()" class="btn" style="background: #e5e7eb;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Usuário
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 // FIREBASE CONFIG
 const firebaseConfig = {
@@ -952,38 +1238,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 console.log('🔥 Firebase inicializado!');
 
-// AUTENTICAÇÃO
-const SENHA_MESTRA = 'Als392b5xv2@';
-
-function fazerLogin(event) {
-    event.preventDefault();
-    const senha = document.getElementById('senhaLogin').value;
-    if (senha === SENHA_MESTRA) {
-        sessionStorage.setItem('autenticado', 'true');
-        document.getElementById('telaLogin').style.display = 'none';
-        document.getElementById('erroLogin').classList.add('hidden');
-    } else {
-        document.getElementById('erroLogin').classList.remove('hidden');
-        document.getElementById('senhaLogin').value = '';
-    }
-}
-
-function verificarAutenticacao() {
-    if (sessionStorage.getItem('autenticado') === 'true') {
-        document.getElementById('telaLogin').style.display = 'none';
-    }
-}
-
-function fazerLogout() {
-    if (confirm('Sair?')) {
-        sessionStorage.removeItem('autenticado');
-        location.reload();
-    }
-}
-
-document.addEventListener('DOMContentLoaded', verificarAutenticacao);
-
-// VARIÁVEIS GLOBAIS
+// VARIÁVEIS GLOBAIS EXISTENTES
 let canaisVenda = [];
 let proximoIdCanal = 1;
 let gastos = [];
@@ -1006,8 +1261,6 @@ let proximoIdAcao = 1;
 let metaMensal = 0;
 let tarefasDia = [];
 let proximoIdTarefa = 1;
-
-// REGISTROS PERMANENTES
 let vendasFechadasRegistro = [];
 let proximoIdVenda = 1;
 let pedidosEnviadosRegistro = [];
@@ -1030,13 +1283,822 @@ let dadosEmpresa = {
     dataFundacao: '',
     observacoes: ''
 };
-
-// TRANSPORTADORAS
 let transportadoras = [];
 let proximoIdTransportadora = 1;
 
-// NAVEGAÇÃO
+// NOVAS VARIÁVEIS MULTI-EMPRESA
+let empresas = [];
+let proximoIdEmpresa = 1;
+let usuarios = [];
+let proximoIdUsuario = 1;
+let usuarioLogado = null;
+let empresaAtual = null;
+
+// DEFINIÇÃO DOS MÓDULOS DO SISTEMA
+const MODULOS_SISTEMA = [
+    { id: 'dashboard', nome: 'Dashboard', icone: 'fa-chart-line', descricao: 'Visão geral e métricas' },
+    { id: 'faturamento', nome: 'Canais de Venda', icone: 'fa-dollar-sign', descricao: 'Gestão de faturamento' },
+    { id: 'dre', nome: 'DRE', icone: 'fa-file-invoice', descricao: 'Demonstrativo de Resultados' },
+    { id: 'crm', nome: 'CRM', icone: 'fa-users', descricao: 'Gestão de negócios e vendas' },
+    { id: 'clientes', nome: 'Clientes', icone: 'fa-address-book', descricao: 'Cadastro de clientes' },
+    { id: 'transportadoras', nome: 'Transportadoras', icone: 'fa-truck', descricao: 'Gestão de transportadoras' },
+    { id: 'pedidos', nome: 'Pedidos Enviados', icone: 'fa-box', descricao: 'Acompanhamento de pedidos' },
+    { id: 'acoes', nome: 'Ações', icone: 'fa-bullseye', descricao: 'Gestão de ações estratégicas' },
+    { id: 'configuracoes', nome: 'Configurações', icone: 'fa-building', descricao: 'Dados da empresa' }
+];
+
+const TIPOS_PERMISSAO = ['consultar', 'cadastrar', 'relatorios'];
+
+const SUPER_ADMIN = {
+    id: 0,
+    nome: 'Administrador do Sistema',
+    email: 'admin@sistema.com',
+    login: 'admin',
+    senha: 'Als392b5xv2@',
+    tipo: 'super_admin',
+    ativo: true,
+    dataCriacao: new Date().toISOString()
+};
+
+// ==========================================
+// AUTENTICAÇÃO MULTI-EMPRESA
+// ==========================================
+
+function fazerLoginMultiempresa(event) {
+    event.preventDefault();
+    
+    const login = document.getElementById('loginUsuario').value.trim();
+    const senha = document.getElementById('senhaUsuario').value;
+    
+    // Verificar se é o Super Admin
+    if (login === SUPER_ADMIN.login && senha === SUPER_ADMIN.senha) {
+        usuarioLogado = SUPER_ADMIN;
+        empresaAtual = null;
+        sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+        
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('erroLogin').classList.add('hidden');
+        
+        carregarSistemaSuperAdmin();
+        return;
+    }
+    
+    // Verificar usuários cadastrados
+    const usuario = usuarios.find(u => 
+        (u.login === login || u.email === login) && 
+        u.senha === senha && 
+        u.ativo
+    );
+    
+    if (usuario) {
+        // Verificar se a empresa está ativa
+        const empresa = empresas.find(e => e.id === usuario.empresaId);
+        
+        if (!empresa) {
+            mostrarErroLogin('Empresa não encontrada!');
+            return;
+        }
+        
+        if (!empresa.ativa) {
+            mostrarErroLogin('Empresa desativada. Entre em contato com o administrador.');
+            return;
+        }
+        
+        // Login bem-sucedido
+        usuarioLogado = usuario;
+        empresaAtual = empresa;
+        
+        sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+        sessionStorage.setItem('empresaAtual', JSON.stringify(empresaAtual));
+        
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('erroLogin').classList.add('hidden');
+        
+        carregarSistemaUsuario();
+    } else {
+        mostrarErroLogin('Login ou senha incorretos!');
+    }
+}
+
+function mostrarErroLogin(mensagem) {
+    const erroDiv = document.getElementById('erroLogin');
+    const mensagemSpan = document.getElementById('mensagemErroLogin');
+    mensagemSpan.textContent = mensagem;
+    erroDiv.classList.remove('hidden');
+    
+    document.getElementById('senhaUsuario').value = '';
+    document.getElementById('senhaUsuario').focus();
+}
+
+function verificarAutenticacao() {
+    const usuarioSalvo = sessionStorage.getItem('usuarioLogado');
+    const empresaSalva = sessionStorage.getItem('empresaAtual');
+    
+    if (usuarioSalvo) {
+        usuarioLogado = JSON.parse(usuarioSalvo);
+        
+        if (usuarioLogado.tipo === 'super_admin') {
+            document.getElementById('telaLogin').style.display = 'none';
+            carregarSistemaSuperAdmin();
+        } else if (empresaSalva) {
+            empresaAtual = JSON.parse(empresaSalva);
+            document.getElementById('telaLogin').style.display = 'none';
+            carregarSistemaUsuario();
+        } else {
+            fazerLogout();
+        }
+    }
+}
+
+function fazerLogout() {
+    if (confirm('Deseja sair do sistema?')) {
+        sessionStorage.removeItem('usuarioLogado');
+        sessionStorage.removeItem('empresaAtual');
+        usuarioLogado = null;
+        empresaAtual = null;
+        location.reload();
+    }
+}
+
+function carregarSistemaSuperAdmin() {
+    document.getElementById('nomeEmpresaSidebar').textContent = 'Painel Administrativo';
+    document.getElementById('usuarioLogadoInfo').textContent = '👑 Super Admin';
+    
+    document.getElementById('menuAdministracao').classList.remove('hidden');
+    document.getElementById('menuConfiguracoes').classList.add('hidden');
+    
+    carregarMenuNavegacao(MODULOS_SISTEMA.map(m => m.id));
+    
+    irParaPagina('empresas');
+}
+
+function carregarSistemaUsuario() {
+    document.getElementById('nomeEmpresaSidebar').textContent = empresaAtual.nomeFantasia || empresaAtual.razaoSocial;
+    document.getElementById('usuarioLogadoInfo').textContent = `👤 ${usuarioLogado.nome}`;
+    
+    document.getElementById('menuAdministracao').classList.add('hidden');
+    document.getElementById('menuConfiguracoes').classList.remove('hidden');
+    
+    const modulosPermitidos = Object.keys(usuarioLogado.permissoes || {}).filter(modulo => {
+        const permissoes = usuarioLogado.permissoes[modulo];
+        return permissoes.consultar || permissoes.cadastrar || permissoes.relatorios;
+    });
+    
+    carregarMenuNavegacao(modulosPermitidos);
+    
+    if (modulosPermitidos.length > 0) {
+        irParaPagina(modulosPermitidos[0]);
+    } else {
+        alert('⚠️ Você não tem permissão para acessar nenhum módulo. Entre em contato com o administrador.');
+    }
+}
+
+function carregarMenuNavegacao(modulosPermitidos) {
+    const menuNav = document.getElementById('menuNavegacao');
+    menuNav.innerHTML = '';
+    
+    MODULOS_SISTEMA.forEach(modulo => {
+        if (modulosPermitidos.includes(modulo.id)) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item';
+            menuItem.onclick = () => irParaPagina(modulo.id);
+            menuItem.innerHTML = `
+                <i class="fas ${modulo.icone}" style="width: 20px;"></i>
+                <span>${modulo.nome}</span>
+            `;
+            menuNav.appendChild(menuItem);
+        }
+    });
+    
+    const firstItem = menuNav.querySelector('.menu-item');
+    if (firstItem) firstItem.classList.add('active');
+}
+
+function verificarPermissao(modulo, tipo) {
+    if (usuarioLogado && usuarioLogado.tipo === 'super_admin') {
+        return true;
+    }
+    
+    if (usuarioLogado && usuarioLogado.permissoes && usuarioLogado.permissoes[modulo]) {
+        return usuarioLogado.permissoes[modulo][tipo] === true;
+    }
+    
+    return false;
+}
+
+function bloquearAcaoSemPermissao(modulo, tipo) {
+    if (!verificarPermissao(modulo, tipo)) {
+        alert('❌ Você não tem permissão para esta ação!\n\nPermissão necessária: ' + tipo.toUpperCase());
+        return true;
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', verificarAutenticacao);
+
+// ==========================================
+// GESTÃO DE EMPRESAS
+// ==========================================
+
+function renderizarEmpresas() {
+    const container = document.getElementById('listaEmpresas');
+    const mensagem = document.getElementById('mensagemSemEmpresas');
+    
+    if (!container || !mensagem) return;
+    
+    if (empresas.length === 0) {
+        container.innerHTML = '';
+        mensagem.classList.remove('hidden');
+        atualizarEstatisticasEmpresas();
+        return;
+    }
+    
+    mensagem.classList.add('hidden');
+    
+    const empresasOrdenadas = [...empresas].sort((a, b) => 
+        a.razaoSocial.localeCompare(b.razaoSocial)
+    );
+    
+    container.innerHTML = empresasOrdenadas.map(empresa => {
+        const usuariosDaEmpresa = usuarios.filter(u => u.empresaId === empresa.id);
+        const modulosLiberados = empresa.modulos ? empresa.modulos.length : 0;
+        const statusCor = empresa.ativa ? '#16a34a' : '#6b7280';
+        const statusLabel = empresa.ativa ? 'Ativa' : 'Inativa';
+        
+        return `
+            <div class="card" style="margin-bottom: 16px; border-left: 4px solid ${statusCor};">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 56px; height: 56px; border-radius: 50%; background: ${statusCor}20; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-building" style="font-size: 24px; color: ${statusCor};"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 18px; font-weight: 600;">${empresa.nomeFantasia || empresa.razaoSocial}</h3>
+                                    <span style="background: ${statusCor}20; color: ${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${statusLabel}
+                                    </span>
+                                </div>
+                                <p style="font-size: 14px; color: #6b7280;">${empresa.razaoSocial}</p>
+                                <p style="font-size: 13px; color: #9ca3af; margin-top: 2px;">
+                                    <i class="fas fa-file-alt"></i> CNPJ: ${empresa.cnpj}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 12px;">
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">👥 Usuários</p>
+                                <p style="font-size: 18px; font-weight: bold;">${usuariosDaEmpresa.length}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📦 Módulos</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">${modulosLiberados}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🌆 Cidade</p>
+                                <p style="font-size: 14px; font-weight: 600;">${empresa.cidade || '-'}/${empresa.estado || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📞 Telefone</p>
+                                <p style="font-size: 14px; font-weight: 600;">${empresa.telefone || 'Não informado'}</p>
+                            </div>
+                        </div>
+                        
+                        ${empresa.email ? `
+                            <div style="font-size: 14px; color: #6b7280;">
+                                <i class="fas fa-envelope"></i> ${empresa.email}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
+                        <button onclick="abrirModalEditarEmpresa(${empresa.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="excluirEmpresa(${empresa.id})" class="btn" style="background: #dc2626; color: white; padding: 8px 16px;">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    atualizarEstatisticasEmpresas();
+}
+
+function atualizarEstatisticasEmpresas() {
+    const total = empresas.length;
+    const ativas = empresas.filter(e => e.ativa).length;
+    const totalUsuarios = usuarios.length;
+    
+    document.getElementById('totalEmpresas').textContent = total;
+    document.getElementById('empresasAtivas').textContent = ativas;
+    document.getElementById('totalUsuariosSistema').textContent = totalUsuarios;
+}
+
+function abrirModalNovaEmpresa() {
+    document.getElementById('tituloModalEmpresa').textContent = 'Nova Empresa';
+    document.getElementById('empresaId').value = '';
+    
+    document.getElementById('empresaRazaoSocial').value = '';
+    document.getElementById('empresaCNPJ').value = '';
+    document.getElementById('empresaNomeFantasia').value = '';
+    document.getElementById('empresaEndereco').value = '';
+    document.getElementById('empresaNumero').value = '';
+    document.getElementById('empresaBairro').value = '';
+    document.getElementById('empresaCidade').value = '';
+    document.getElementById('empresaEstado').value = '';
+    document.getElementById('empresaEmail').value = '';
+    document.getElementById('empresaTelefone').value = '';
+    document.getElementById('empresaAtiva').checked = true;
+    
+    carregarModulosEmpresa([]);
+    trocarAbaEmpresa('dados');
+    
+    document.getElementById('modalEmpresa').classList.remove('hidden');
+}
+
+function abrirModalEditarEmpresa(empresaId) {
+    const empresa = empresas.find(e => e.id === empresaId);
+    if (!empresa) return;
+    
+    document.getElementById('tituloModalEmpresa').textContent = 'Editar Empresa';
+    document.getElementById('empresaId').value = empresa.id;
+    
+    document.getElementById('empresaRazaoSocial').value = empresa.razaoSocial;
+    document.getElementById('empresaCNPJ').value = empresa.cnpj;
+    document.getElementById('empresaNomeFantasia').value = empresa.nomeFantasia || '';
+    document.getElementById('empresaEndereco').value = empresa.endereco || '';
+    document.getElementById('empresaNumero').value = empresa.numero || '';
+    document.getElementById('empresaBairro').value = empresa.bairro || '';
+    document.getElementById('empresaCidade').value = empresa.cidade || '';
+    document.getElementById('empresaEstado').value = empresa.estado || '';
+    document.getElementById('empresaEmail').value = empresa.email || '';
+    document.getElementById('empresaTelefone').value = empresa.telefone || '';
+    document.getElementById('empresaAtiva').checked = empresa.ativa;
+    
+    carregarModulosEmpresa(empresa.modulos || []);
+    trocarAbaEmpresa('dados');
+    
+    document.getElementById('modalEmpresa').classList.remove('hidden');
+}
+
+function fecharModalEmpresa() {
+    document.getElementById('modalEmpresa').classList.add('hidden');
+}
+
+function trocarAbaEmpresa(aba) {
+    document.getElementById('abaEmpresaDados').style.color = aba === 'dados' ? '#3b82f6' : '#6b7280';
+    document.getElementById('abaEmpresaDados').style.borderBottomColor = aba === 'dados' ? '#3b82f6' : 'transparent';
+    
+    document.getElementById('abaEmpresaModulos').style.color = aba === 'modulos' ? '#3b82f6' : '#6b7280';
+    document.getElementById('abaEmpresaModulos').style.borderBottomColor = aba === 'modulos' ? '#3b82f6' : 'transparent';
+    
+    document.getElementById('abaEmpresaDadosConteudo').classList.toggle('hidden', aba !== 'dados');
+    document.getElementById('abaEmpresaModulosConteudo').classList.toggle('hidden', aba !== 'modulos');
+}
+
+function carregarModulosEmpresa(modulosSelecionados) {
+    const container = document.getElementById('listaModulosEmpresa');
+    
+    container.innerHTML = MODULOS_SISTEMA.map(modulo => {
+        const checked = modulosSelecionados.includes(modulo.id) ? 'checked' : '';
+        
+        return `
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
+                <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+                    <input type="checkbox" class="modulo-checkbox" value="${modulo.id}" ${checked} style="width: 20px; height: 20px; margin-top: 2px;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <i class="fas ${modulo.icone}" style="color: #3b82f6;"></i>
+                            <strong>${modulo.nome}</strong>
+                        </div>
+                        <p style="font-size: 13px; color: #6b7280;">${modulo.descricao}</p>
+                    </div>
+                </label>
+            </div>
+        `;
+    }).join('');
+}
+
+function salvarEmpresa(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('empresaId').value;
+    
+    const modulosSelecionados = Array.from(document.querySelectorAll('.modulo-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    
+    const dadosEmpresa = {
+        razaoSocial: document.getElementById('empresaRazaoSocial').value,
+        cnpj: document.getElementById('empresaCNPJ').value,
+        nomeFantasia: document.getElementById('empresaNomeFantasia').value,
+        endereco: document.getElementById('empresaEndereco').value,
+        numero: document.getElementById('empresaNumero').value,
+        bairro: document.getElementById('empresaBairro').value,
+        cidade: document.getElementById('empresaCidade').value,
+        estado: document.getElementById('empresaEstado').value,
+        email: document.getElementById('empresaEmail').value,
+        telefone: document.getElementById('empresaTelefone').value,
+        ativa: document.getElementById('empresaAtiva').checked,
+        modulos: modulosSelecionados
+    };
+    
+    if (id) {
+        const empresa = empresas.find(e => e.id === parseInt(id));
+        if (empresa) {
+            Object.assign(empresa, dadosEmpresa);
+            alert('✅ Empresa atualizada com sucesso!\n\n📦 Módulos liberados: ' + modulosSelecionados.length);
+        }
+    } else {
+        empresas.push({
+            id: proximoIdEmpresa++,
+            ...dadosEmpresa,
+            dataCriacao: new Date().toISOString()
+        });
+        alert('✅ Empresa cadastrada com sucesso!\n\n📦 Módulos liberados: ' + modulosSelecionados.length);
+    }
+    
+    renderizarEmpresas();
+    fecharModalEmpresa();
+    salvarDados();
+}
+
+function excluirEmpresa(empresaId) {
+    const empresa = empresas.find(e => e.id === empresaId);
+    if (!empresa) return;
+    
+    const usuariosDaEmpresa = usuarios.filter(u => u.empresaId === empresaId);
+    
+    if (usuariosDaEmpresa.length > 0) {
+        alert('❌ Não é possível excluir!\n\n' + usuariosDaEmpresa.length + ' usuário(s) vinculado(s) a esta empresa.\n\nExclua ou transfira os usuários primeiro.');
+        return;
+    }
+    
+    if (confirm('❌ Excluir empresa "' + empresa.razaoSocial + '"?\n\nEsta ação não pode ser desfeita!')) {
+        empresas = empresas.filter(e => e.id !== empresaId);
+        renderizarEmpresas();
+        salvarDados();
+        alert('✅ Empresa excluída com sucesso!');
+    }
+}
+
+// ==========================================
+// GESTÃO DE USUÁRIOS
+// ==========================================
+
+function renderizarUsuarios() {
+    const container = document.getElementById('listaUsuarios');
+    const mensagem = document.getElementById('mensagemSemUsuarios');
+    
+    if (!container || !mensagem) return;
+    
+    if (usuarios.length === 0) {
+        container.innerHTML = '';
+        mensagem.classList.remove('hidden');
+        return;
+    }
+    
+    mensagem.classList.add('hidden');
+    
+    const filtroEmpresa = document.getElementById('filtroEmpresaUsuarios')?.value || 'todas';
+    const filtroStatus = document.getElementById('filtroStatusUsuarios')?.value || 'todos';
+    
+    let usuariosFiltrados = [...usuarios];
+    
+    if (filtroEmpresa !== 'todas') {
+        usuariosFiltrados = usuariosFiltrados.filter(u => u.empresaId === parseInt(filtroEmpresa));
+    }
+    
+    if (filtroStatus === 'ativos') {
+        usuariosFiltrados = usuariosFiltrados.filter(u => u.ativo);
+    } else if (filtroStatus === 'inativos') {
+        usuariosFiltrados = usuariosFiltrados.filter(u => !u.ativo);
+    }
+    
+    usuariosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+    
+    container.innerHTML = usuariosFiltrados.map(usuario => {
+        const empresa = empresas.find(e => e.id === usuario.empresaId);
+        const statusCor = usuario.ativo ? '#16a34a' : '#6b7280';
+        const statusLabel = usuario.ativo ? 'Ativo' : 'Inativo';
+        
+        const totalModulos = Object.keys(usuario.permissoes || {}).length;
+        const modulosConsulta = Object.values(usuario.permissoes || {}).filter(p => p.consultar).length;
+        const modulosCadastro = Object.values(usuario.permissoes || {}).filter(p => p.cadastrar).length;
+        const modulosRelatorios = Object.values(usuario.permissoes || {}).filter(p => p.relatorios).length;
+        
+        return `
+            <div class="card" style="margin-bottom: 16px; border-left: 4px solid ${statusCor};">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 56px; height: 56px; border-radius: 50%; background: ${statusCor}20; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 24px; font-weight: bold; color: ${statusCor};">
+                                    ${usuario.nome.charAt(0).toUpperCase()}
+                                </span>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 18px; font-weight: 600;">${usuario.nome}</h3>
+                                    <span style="background: ${statusCor}20; color: ${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${statusLabel}
+                                    </span>
+                                </div>
+                                <p style="font-size: 14px; color: #6b7280;">
+                                    <i class="fas fa-building"></i> ${empresa ? empresa.nomeFantasia || empresa.razaoSocial : 'Empresa não encontrada'}
+                                </p>
+                                <p style="font-size: 13px; color: #9ca3af; margin-top: 2px;">
+                                    <i class="fas fa-user"></i> Login: <strong>${usuario.login}</strong>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 12px;">
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📦 Módulos</p>
+                                <p style="font-size: 18px; font-weight: bold;">${totalModulos}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">👁️ Consulta</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">${modulosConsulta}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">✏️ Cadastro</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">${modulosCadastro}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📊 Relatórios</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #f59e0b;">${modulosRelatorios}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
+                            ${usuario.email ? `<span><i class="fas fa-envelope"></i> ${usuario.email}</span>` : ''}
+                            ${usuario.telefone ? `<span><i class="fas fa-phone"></i> ${usuario.telefone}</span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
+                        <button onclick="abrirModalEditarUsuario(${usuario.id})" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="excluirUsuario(${usuario.id})" class="btn" style="background: #dc2626; color: white; padding: 8px 16px;">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function carregarFiltrosUsuarios() {
+    const selectEmpresa = document.getElementById('filtroEmpresaUsuarios');
+    if (!selectEmpresa) return;
+    
+    selectEmpresa.innerHTML = '<option value="todas">Todas as Empresas</option>';
+    empresas.forEach(empresa => {
+        selectEmpresa.innerHTML += `<option value="${empresa.id}">${empresa.nomeFantasia || empresa.razaoSocial}</option>`;
+    });
+}
+
+function abrirModalNovoUsuario() {
+    document.getElementById('tituloModalUsuario').textContent = 'Novo Usuário';
+    document.getElementById('usuarioId').value = '';
+    
+    document.getElementById('usuarioEmpresaId').value = '';
+    document.getElementById('usuarioNome').value = '';
+    document.getElementById('usuarioEmail').value = '';
+    document.getElementById('usuarioTelefone').value = '';
+    document.getElementById('usuarioLogin').value = '';
+    document.getElementById('usuarioSenha').value = '';
+    document.getElementById('usuarioAtivo').checked = true;
+    
+    carregarEmpresasSelect();
+    
+    document.getElementById('mensagemSelecioneEmpresa').classList.remove('hidden');
+    document.getElementById('listaPermissoesUsuario').classList.add('hidden');
+    document.getElementById('listaPermissoesUsuario').innerHTML = '';
+    
+    trocarAbaUsuario('dados');
+    
+    document.getElementById('modalUsuario').classList.remove('hidden');
+}
+
+function abrirModalEditarUsuario(usuarioId) {
+    const usuario = usuarios.find(u => u.id === usuarioId);
+    if (!usuario) return;
+    
+    document.getElementById('tituloModalUsuario').textContent = 'Editar Usuário';
+    document.getElementById('usuarioId').value = usuario.id;
+    
+    carregarEmpresasSelect();
+    document.getElementById('usuarioEmpresaId').value = usuario.empresaId;
+    document.getElementById('usuarioNome').value = usuario.nome;
+    document.getElementById('usuarioEmail').value = usuario.email;
+    document.getElementById('usuarioTelefone').value = usuario.telefone || '';
+    document.getElementById('usuarioLogin').value = usuario.login;
+    document.getElementById('usuarioSenha').value = usuario.senha;
+    document.getElementById('usuarioAtivo').checked = usuario.ativo;
+    
+    carregarModulosEmpresaUsuario();
+    carregarPermissoesUsuario(usuario.permissoes || {});
+    
+    trocarAbaUsuario('dados');
+    
+    document.getElementById('modalUsuario').classList.remove('hidden');
+}
+
+function fecharModalUsuario() {
+    document.getElementById('modalUsuario').classList.add('hidden');
+}
+
+function trocarAbaUsuario(aba) {
+    document.getElementById('abaUsuarioDados').style.color = aba === 'dados' ? '#3b82f6' : '#6b7280';
+    document.getElementById('abaUsuarioDados').style.borderBottomColor = aba === 'dados' ? '#3b82f6' : 'transparent';
+    
+    document.getElementById('abaUsuarioPermissoes').style.color = aba === 'permissoes' ? '#3b82f6' : '#6b7280';
+    document.getElementById('abaUsuarioPermissoes').style.borderBottomColor = aba === 'permissoes' ? '#3b82f6' : 'transparent';
+    
+    document.getElementById('abaUsuarioDadosConteudo').classList.toggle('hidden', aba !== 'dados');
+    document.getElementById('abaUsuarioPermissoesConteudo').classList.toggle('hidden', aba !== 'permissoes');
+}
+
+function carregarEmpresasSelect() {
+    const select = document.getElementById('usuarioEmpresaId');
+    select.innerHTML = '<option value="">Selecione uma empresa</option>';
+    
+    empresas.forEach(empresa => {
+        select.innerHTML += `<option value="${empresa.id}">${empresa.nomeFantasia || empresa.razaoSocial}</option>`;
+    });
+}
+
+function carregarModulosEmpresaUsuario() {
+    const empresaId = parseInt(document.getElementById('usuarioEmpresaId').value);
+    
+    if (!empresaId) {
+        document.getElementById('mensagemSelecioneEmpresa').classList.remove('hidden');
+        document.getElementById('listaPermissoesUsuario').classList.add('hidden');
+        return;
+    }
+    
+    const empresa = empresas.find(e => e.id === empresaId);
+    if (!empresa || !empresa.modulos || empresa.modulos.length === 0) {
+        document.getElementById('mensagemSelecioneEmpresa').innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+            <p style="font-size: 16px; font-weight: 600;">Nenhum módulo liberado para esta empresa</p>
+            <p style="font-size: 14px; margin-top: 8px;">Configure os módulos na edição da empresa</p>
+        `;
+        document.getElementById('mensagemSelecioneEmpresa').classList.remove('hidden');
+        document.getElementById('listaPermissoesUsuario').classList.add('hidden');
+        return;
+    }
+    
+    document.getElementById('mensagemSelecioneEmpresa').classList.add('hidden');
+    document.getElementById('listaPermissoesUsuario').classList.remove('hidden');
+    
+    const container = document.getElementById('listaPermissoesUsuario');
+    
+    container.innerHTML = empresa.modulos.map(moduloId => {
+        const modulo = MODULOS_SISTEMA.find(m => m.id === moduloId);
+        if (!modulo) return '';
+        
+        return `
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas ${modulo.icone}" style="color: #3b82f6;"></i>
+                    </div>
+                    <div>
+                        <strong style="font-size: 16px;">${modulo.nome}</strong>
+                        <p style="font-size: 13px; color: #6b7280; margin-top: 2px;">${modulo.descricao}</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-left: 52px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="permissao-checkbox" data-modulo="${moduloId}" data-tipo="consultar" style="width: 18px; height: 18px;">
+                        <span style="font-size: 14px;">👁️ Consultar</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="permissao-checkbox" data-modulo="${moduloId}" data-tipo="cadastrar" style="width: 18px; height: 18px;">
+                        <span style="font-size: 14px;">✏️ Cadastrar</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="permissao-checkbox" data-modulo="${moduloId}" data-tipo="relatorios" style="width: 18px; height: 18px;">
+                        <span style="font-size: 14px;">📊 Relatórios</span>
+                    </label>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function carregarPermissoesUsuario(permissoes) {
+    Object.keys(permissoes).forEach(moduloId => {
+        const perms = permissoes[moduloId];
+        
+        TIPOS_PERMISSAO.forEach(tipo => {
+            const checkbox = document.querySelector(
+                `.permissao-checkbox[data-modulo="${moduloId}"][data-tipo="${tipo}"]`
+            );
+            if (checkbox && perms[tipo]) {
+                checkbox.checked = true;
+            }
+        });
+    });
+}
+
+function salvarUsuario(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('usuarioId').value;
+    const empresaId = parseInt(document.getElementById('usuarioEmpresaId').value);
+    
+    const empresa = empresas.find(e => e.id === empresaId);
+    if (!empresa) {
+        alert('❌ Empresa não encontrada!');
+        return;
+    }
+    
+    const permissoes = {};
+    const checkboxes = document.querySelectorAll('.permissao-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        const moduloId = checkbox.dataset.modulo;
+        const tipo = checkbox.dataset.tipo;
+        
+        if (!permissoes[moduloId]) {
+            permissoes[moduloId] = {
+                consultar: false,
+                cadastrar: false,
+                relatorios: false
+            };
+        }
+        
+        permissoes[moduloId][tipo] = checkbox.checked;
+    });
+    
+    const dadosUsuario = {
+        empresaId: empresaId,
+        nome: document.getElementById('usuarioNome').value,
+        email: document.getElementById('usuarioEmail').value,
+        telefone: document.getElementById('usuarioTelefone').value,
+        login: document.getElementById('usuarioLogin').value,
+        senha: document.getElementById('usuarioSenha').value,
+        ativo: document.getElementById('usuarioAtivo').checked,
+        permissoes: permissoes
+    };
+    
+    if (id) {
+        const usuario = usuarios.find(u => u.id === parseInt(id));
+        if (usuario) {
+            Object.assign(usuario, dadosUsuario);
+            alert('✅ Usuário atualizado com sucesso!');
+        }
+    } else {
+        usuarios.push({
+            id: proximoIdUsuario++,
+            ...dadosUsuario,
+            dataCriacao: new Date().toISOString()
+        });
+        alert('✅ Usuário cadastrado com sucesso!');
+    }
+    
+    renderizarUsuarios();
+    fecharModalUsuario();
+    salvarDados();
+}
+
+function excluirUsuario(usuarioId) {
+    const usuario = usuarios.find(u => u.id === usuarioId);
+    if (!usuario) return;
+    
+    if (confirm('❌ Excluir usuário "' + usuario.nome + '"?\n\nEsta ação não pode ser desfeita!')) {
+        usuarios = usuarios.filter(u => u.id !== usuarioId);
+        renderizarUsuarios();
+        salvarDados();
+        alert('✅ Usuário excluído com sucesso!');
+    }
+}
+
+// ==========================================
+// NAVEGAÇÃO COM CONTROLE DE PERMISSÕES
+// ==========================================
+
 function irParaPagina(pageName) {
+    // Verificar permissão (exceto super admin)
+    if (usuarioLogado && usuarioLogado.tipo !== 'super_admin' && pageName !== 'empresas' && pageName !== 'usuarios') {
+        if (!verificarPermissao(pageName, 'consultar')) {
+            alert('❌ Você não tem permissão para acessar este módulo!');
+            return;
+        }
+    }
+    
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
     const pagina = document.getElementById('page-' + pageName);
     if (pagina) pagina.classList.remove('hidden');
@@ -1049,14 +2111,16 @@ function irParaPagina(pageName) {
     
     const titles = { 
         dashboard: 'Dashboard', 
-        faturamento: 'Faturamento', 
+        faturamento: 'Canais de Venda', 
         dre: 'DRE', 
         crm: 'CRM', 
         clientes: 'Clientes', 
         pedidos: 'Pedidos Enviados', 
         acoes: 'Ações', 
         transportadoras: 'Transportadoras', 
-        configuracoes: 'Dados da Empresa' 
+        configuracoes: 'Dados da Empresa',
+        empresas: 'Gestão de Empresas',
+        usuarios: 'Gestão de Usuários'
     };
     document.getElementById('page-title').textContent = titles[pageName] || 'Sistema';
     
@@ -1069,12 +2133,21 @@ function irParaPagina(pageName) {
     if (pageName === 'pedidos') renderizarPedidosMes();
     if (pageName === 'acoes') renderizarAcoes();
     if (pageName === 'configuracoes') carregarDadosEmpresa();
+    if (pageName === 'empresas') renderizarEmpresas();
+    if (pageName === 'usuarios') {
+        carregarFiltrosUsuarios();
+        renderizarUsuarios();
+    }
 }
 
-// SALVAR/CARREGAR
+// ==========================================
+// SALVAR/CARREGAR COM MULTI-EMPRESA
+// ==========================================
+
 async function salvarDados() {
     try {
         const dados = {
+            // Dados existentes
             canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
             etapasPipeline, negocios, proximoIdNegocio,
             pedidos, proximoIdPedido, acoes, proximoIdAcao,
@@ -1082,6 +2155,11 @@ async function salvarDados() {
             vendasFechadasRegistro, proximoIdVenda,
             pedidosEnviadosRegistro, proximoIdPedidoEnviado,
             dadosEmpresa, transportadoras, proximoIdTransportadora,
+            
+            // Novos dados multi-empresa
+            empresas, proximoIdEmpresa,
+            usuarios, proximoIdUsuario,
+            
             ultimaAtualizacao: new Date().toISOString()
         };
         
@@ -1099,6 +2177,8 @@ async function salvarDados() {
                 vendasFechadasRegistro, proximoIdVenda,
                 pedidosEnviadosRegistro, proximoIdPedidoEnviado,
                 dadosEmpresa, transportadoras, proximoIdTransportadora,
+                empresas, proximoIdEmpresa,
+                usuarios, proximoIdUsuario,
             };
             localStorage.setItem('sistemaGestao', JSON.stringify(dados));
             console.log('💾 Salvo localmente');
@@ -1113,6 +2193,7 @@ async function carregarDados() {
         if (doc.exists) {
             const dados = doc.data();
             
+            // Dados existentes
             canaisVenda = dados.canaisVenda || [];
             proximoIdCanal = dados.proximoIdCanal || 1;
             gastos = dados.gastos || [];
@@ -1135,6 +2216,12 @@ async function carregarDados() {
             transportadoras = dados.transportadoras || [];
             proximoIdTransportadora = dados.proximoIdTransportadora || 1;
             
+            // Novos dados multi-empresa
+            empresas = dados.empresas || [];
+            proximoIdEmpresa = dados.proximoIdEmpresa || 1;
+            usuarios = dados.usuarios || [];
+            proximoIdUsuario = dados.proximoIdUsuario || 1;
+            
             console.log('☁️ Carregado do Firebase!');
             localStorage.setItem('sistemaGestao', JSON.stringify(dados));
         } else {
@@ -1151,6 +2238,7 @@ function carregarDadosLocal() {
         const dados = localStorage.getItem('sistemaGestao');
         if (dados) {
             const p = JSON.parse(dados);
+            
             canaisVenda = p.canaisVenda || [];
             proximoIdCanal = p.proximoIdCanal || 1;
             gastos = p.gastos || [];
@@ -1173,16 +2261,21 @@ function carregarDadosLocal() {
             transportadoras = p.transportadoras || [];
             proximoIdTransportadora = p.proximoIdTransportadora || 1;
             
+            empresas = p.empresas || [];
+            proximoIdEmpresa = p.proximoIdEmpresa || 1;
+            usuarios = p.usuarios || [];
+            proximoIdUsuario = p.proximoIdUsuario || 1;
+            
             console.log('💾 Carregado localmente!');
         }
     } catch(e) { console.log('Erro carregar'); }
 }
 
-// BACKUP MANUAL
+// BACKUP MANUAL (ATUALIZADO)
 function exportarBackup() {
     const backup = {
         data: new Date().toISOString(),
-        versao: '2.0',
+        versao: '3.0-multiempresa',
         dados: {
             canaisVenda, proximoIdCanal, gastos, proximoIdGasto,
             etapasPipeline, negocios, proximoIdNegocio,
@@ -1190,7 +2283,9 @@ function exportarBackup() {
             metaMensal, tarefasDia, proximoIdTarefa,
             vendasFechadasRegistro, proximoIdVenda,
             pedidosEnviadosRegistro, proximoIdPedidoEnviado,
-            dadosEmpresa, transportadoras, proximoIdTransportadora
+            dadosEmpresa, transportadoras, proximoIdTransportadora,
+            empresas, proximoIdEmpresa,
+            usuarios, proximoIdUsuario
         }
     };
     
@@ -1199,9 +2294,9 @@ function exportarBackup() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'backup-gestao-' + new Date().toISOString().split('T')[0] + '.json';
+    link.download = 'backup-gestao-multiempresa-' + new Date().toISOString().split('T')[0] + '.json';
     link.click();
-    alert('✅ Backup realizado!');
+    alert('✅ Backup realizado com Multi-empresa!');
 }
 
 function importarBackup() {
@@ -1241,6 +2336,10 @@ function importarBackup() {
                 dadosEmpresa = d.dadosEmpresa || dadosEmpresa;
                 transportadoras = d.transportadoras || [];
                 proximoIdTransportadora = d.proximoIdTransportadora || 1;
+                empresas = d.empresas || [];
+                proximoIdEmpresa = d.proximoIdEmpresa || 1;
+                usuarios = d.usuarios || [];
+                proximoIdUsuario = d.proximoIdUsuario || 1;
                 
                 salvarDados();
                 location.reload();
@@ -1253,7 +2352,10 @@ function importarBackup() {
     input.click();
 }
 
-// DASHBOARD
+// ==========================================
+// DASHBOARD (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function atualizarDashboard() {
     const hoje = new Date();
     const mesAtual = hoje.getMonth();
@@ -1491,7 +2593,6 @@ function renderizarTopClientes() {
     });
 
     const top5 = Object.values(vendasPorCliente).sort((a, b) => b.total - a.total).slice(0, 5);
-
     const medalhas = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
 
     container.innerHTML = top5.map((cliente, index) => `
@@ -1634,7 +2735,10 @@ function excluirTarefa(tarefaId) {
     }
 }
 
-// FATURAMENTO
+// ==========================================
+// FATURAMENTO (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function renderizarCanais() {
     const c = document.getElementById('canaisContainer');
     if (!c) return;
@@ -1726,7 +2830,10 @@ function salvarVenda(event) {
     }
 }
 
-// DRE
+// ==========================================
+// DRE (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function atualizarDRE() {
     const vendasFechadas = vendasFechadasRegistro;
     
@@ -1800,7 +2907,10 @@ function excluirGasto(id) {
     }
 }
 
-// CRM
+// ==========================================
+// CRM (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function renderizarKanban() {
     const board = document.getElementById('kanbanBoard');
     if (!board) return;
@@ -1845,13 +2955,8 @@ function renderizarKanban() {
     });
 }
 
-function iniciarArrasto(negocioId) { 
-    negocioArrastando = negocioId; 
-}
-
-function permitirSoltar(event) { 
-    event.preventDefault(); 
-}
+function iniciarArrasto(negocioId) { negocioArrastando = negocioId; }
+function permitirSoltar(event) { event.preventDefault(); }
 
 function soltarCard(event, novaEtapaId) {
     event.preventDefault();
@@ -1863,7 +2968,6 @@ function soltarCard(event, novaEtapaId) {
     const etapaAnterior = negocio.etapaId;
     negocio.etapaId = novaEtapaId;
 
-    // VENDA FECHADA - CRIAR REGISTRO PERMANENTE
     const etapaFechada = etapasPipeline.find(e => e.nome === 'Venda Fechada');
     if (novaEtapaId === etapaFechada.id && etapaAnterior !== etapaFechada.id) {
         
@@ -1898,17 +3002,16 @@ function soltarCard(event, novaEtapaId) {
                         valor: novaVenda.valor,
                         descricao: novaVenda.titulo + ' - ' + novaVenda.cliente
                     });
-                    alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n📊 Canal: ' + canal.nome + '\n\n✨ Pode mover o card agora - o faturamento ficará registrado!');
+                    alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n📊 Canal: ' + canal.nome);
                 }
             } else {
-                alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR') + '\n\n✨ Pode mover o card - o faturamento fica registrado!');
+                alert('✅ VENDA REGISTRADA PERMANENTEMENTE!\n\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Data: ' + new Date().toLocaleDateString('pt-BR'));
             }
         } else {
             alert('ℹ️ Venda já registrada em ' + new Date(jaRegistrado.dataFechamento).toLocaleDateString('pt-BR'));
         }
     }
 
-    // PEDIDO ENVIADO - CRIAR REGISTRO PERMANENTE
     const etapaPedidoEnviado = etapasPipeline.find(e => e.nome === 'Pedido Enviado');
     if (novaEtapaId === etapaPedidoEnviado.id && etapaAnterior !== etapaPedidoEnviado.id) {
         
@@ -1937,7 +3040,7 @@ function soltarCard(event, novaEtapaId) {
             
             pedidosEnviadosRegistro.push(novoPedido);
             
-            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\n📅 Dia: ' + hoje.getDate() + '\n\n✨ Vá em "Pedidos" para adicionar NF e rastreio!');
+            alert('📦 PEDIDO REGISTRADO PERMANENTEMENTE!\n\n✅ Cliente: ' + negocio.cliente + '\n💰 Valor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
         } else {
             alert('ℹ️ Pedido já registrado em ' + new Date(jaRegistrado.dataEnvio).toLocaleDateString('pt-BR'));
         }
@@ -2146,7 +3249,10 @@ function excluirColunaLivre(etapaId) {
     }
 }
 
-// FUNÇÕES AUXILIARES PARA TRANSPORTADORAS
+// ==========================================
+// FUNÇÕES AUXILIARES TRANSPORTADORAS
+// ==========================================
+
 function obterLinkRastreamento(pedido) {
     if (!pedido.codigoRastreio) return '#';
     if (!pedido.transportadoraId) return 'https://www.google.com/search?q=' + pedido.codigoRastreio;
@@ -2164,7 +3270,10 @@ function obterNomeTransportadora(pedido) {
     return transp ? transp.nome : '';
 }
 
-// PEDIDOS
+// ==========================================
+// PEDIDOS (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function renderizarPedidosMes() {
     const container = document.getElementById('listaPedidosPorDia');
     const mensagem = document.getElementById('mensagemSemPedidosEnviados');
@@ -2292,7 +3401,6 @@ function abrirModalEditarPedidoRegistro(pedidoId) {
     document.getElementById('pedidoEnviadoRastreio').value = pedido.codigoRastreio || '';
     document.getElementById('pedidoEnviadoObs').value = pedido.observacoes || '';
 
-    // ✅ CORRIGIDO: Carregar transportadoras ativas
     const selectTransp = document.getElementById('pedidoEnviadoTransportadora');
     selectTransp.innerHTML = '<option value="">Selecione</option>';
     transportadoras.filter(t => t.ativa).forEach(t => {
@@ -2326,7 +3434,10 @@ function salvarEdicaoPedidoEnviado(event) {
     }
 }
 
-// AÇÕES
+// ==========================================
+// AÇÕES (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function renderizarAcoes() {
     const g = document.getElementById('gridAcoes');
     if (!g) return;
@@ -2379,7 +3490,10 @@ function excluirAcao(id) {
     }
 }
 
-// PÁGINA DE CLIENTES
+// ==========================================
+// CLIENTES (FUNÇÕES EXISTENTES)
+// ==========================================
+
 function gerarListaClientes() {
     const clientesMap = {};
 
@@ -2565,7 +3679,6 @@ function renderizarClientes() {
 
 function atualizarEstatisticasClientes(clientes) {
     const total = clientes.length;
-    
     const hoje = new Date();
     const diasInativo = 90;
     
@@ -2724,93 +3837,13 @@ function exportarClientes() {
     const nomeArquivo = 'clientes-' + new Date().toISOString().split('T')[0] + '.xlsx';
     XLSX.writeFile(wb, nomeArquivo);
 
-    alert('✅ Lista de clientes exportada em Excel!\n\n📊 ' + clientes.length + ' cliente(s)\n📁 Arquivo: ' + nomeArquivo);
+    alert('✅ Lista de clientes exportada em Excel!');
 }
 
-// CONFIGURAÇÕES DA EMPRESA
-function carregarDadosEmpresa() {
-    document.getElementById('nomeEmpresa').value = dadosEmpresa.nome || '';
-    document.getElementById('cnpjEmpresa').value = dadosEmpresa.cnpj || '';
-    document.getElementById('inscricaoEstadual').value = dadosEmpresa.inscricaoEstadual || '';
-    document.getElementById('inscricaoMunicipal').value = dadosEmpresa.inscricaoMunicipal || '';
-    document.getElementById('enderecoEmpresa').value = dadosEmpresa.endereco || '';
-    document.getElementById('telefoneEmpresa').value = dadosEmpresa.telefone || '';
-    document.getElementById('celularEmpresa').value = dadosEmpresa.celular || '';
-    document.getElementById('emailEmpresa').value = dadosEmpresa.email || '';
-    document.getElementById('nomeResponsavel').value = dadosEmpresa.nomeResponsavel || '';
-    document.getElementById('cpfResponsavel').value = dadosEmpresa.cpfResponsavel || '';
-    document.getElementById('rgResponsavel').value = dadosEmpresa.rgResponsavel || '';
-    document.getElementById('cargoResponsavel').value = dadosEmpresa.cargoResponsavel || '';
-    document.getElementById('siteEmpresa').value = dadosEmpresa.site || '';
-    document.getElementById('instagramEmpresa').value = dadosEmpresa.instagram || '';
-    document.getElementById('dataFundacao').value = dadosEmpresa.dataFundacao || '';
-    document.getElementById('observacoesEmpresa').value = dadosEmpresa.observacoes || '';
+// ==========================================
+// TRANSPORTADORAS (FUNÇÕES EXISTENTES)
+// ==========================================
 
-    atualizarResumoEmpresa();
-}
-
-function salvarDadosEmpresa(event) {
-    event.preventDefault();
-
-    dadosEmpresa = {
-        nome: document.getElementById('nomeEmpresa').value,
-        cnpj: document.getElementById('cnpjEmpresa').value,
-        inscricaoEstadual: document.getElementById('inscricaoEstadual').value,
-        inscricaoMunicipal: document.getElementById('inscricaoMunicipal').value,
-        endereco: document.getElementById('enderecoEmpresa').value,
-        telefone: document.getElementById('telefoneEmpresa').value,
-        celular: document.getElementById('celularEmpresa').value,
-        email: document.getElementById('emailEmpresa').value,
-        nomeResponsavel: document.getElementById('nomeResponsavel').value,
-        cpfResponsavel: document.getElementById('cpfResponsavel').value,
-        rgResponsavel: document.getElementById('rgResponsavel').value,
-        cargoResponsavel: document.getElementById('cargoResponsavel').value,
-        site: document.getElementById('siteEmpresa').value,
-        instagram: document.getElementById('instagramEmpresa').value,
-        dataFundacao: document.getElementById('dataFundacao').value,
-        observacoes: document.getElementById('observacoesEmpresa').value
-    };
-
-    atualizarResumoEmpresa();
-    salvarDados();
-    alert('✅ Dados da empresa salvos com sucesso!\n\nSincronizado com Firebase ☁️');
-}
-
-function atualizarResumoEmpresa() {
-    const nomeExibir = dadosEmpresa.nome || 'Minha Empresa';
-    const cnpjExibir = dadosEmpresa.cnpj ? 'CNPJ: ' + dadosEmpresa.cnpj : 'CNPJ não cadastrado';
-
-    document.getElementById('nomeEmpresaResumo').textContent = nomeExibir;
-    document.getElementById('cnpjEmpresaResumo').textContent = cnpjExibir;
-
-    const logoText = document.querySelector('.sidebar h2');
-    if (logoText && dadosEmpresa.nome) {
-        logoText.textContent = dadosEmpresa.nome;
-    }
-}
-
-function limparFormularioEmpresa() {
-    if (confirm('Limpar todos os campos do formulário?')) {
-        document.getElementById('nomeEmpresa').value = '';
-        document.getElementById('cnpjEmpresa').value = '';
-        document.getElementById('inscricaoEstadual').value = '';
-        document.getElementById('inscricaoMunicipal').value = '';
-        document.getElementById('enderecoEmpresa').value = '';
-        document.getElementById('telefoneEmpresa').value = '';
-        document.getElementById('celularEmpresa').value = '';
-        document.getElementById('emailEmpresa').value = '';
-        document.getElementById('nomeResponsavel').value = '';
-        document.getElementById('cpfResponsavel').value = '';
-        document.getElementById('rgResponsavel').value = '';
-        document.getElementById('cargoResponsavel').value = '';
-        document.getElementById('siteEmpresa').value = '';
-        document.getElementById('instagramEmpresa').value = '';
-        document.getElementById('dataFundacao').value = '';
-        document.getElementById('observacoesEmpresa').value = '';
-    }
-}
-
-// TRANSPORTADORAS
 function renderizarTransportadoras() {
     const container = document.getElementById('listaTransportadoras');
     const mensagem = document.getElementById('mensagemSemTransportadoras');
@@ -2967,7 +4000,7 @@ function excluirTransportadora(id) {
     const pedidosUsando = pedidosEnviadosRegistro.filter(p => p.transportadoraId === id).length;
 
     if (pedidosUsando > 0) {
-        alert('❌ Não é possível excluir!\n\n' + pedidosUsando + ' pedido(s) está(ão) usando esta transportadora.\n\nDesative a transportadora ao invés de excluir.');
+        alert('❌ Não é possível excluir!\n\n' + pedidosUsando + ' pedido(s) está(ão) usando esta transportadora.');
         return;
     }
 
@@ -2979,25 +4012,104 @@ function excluirTransportadora(id) {
     }
 }
 
-// INICIALIZAÇÃO
+// ==========================================
+// CONFIGURAÇÕES EMPRESA (FUNÇÕES EXISTENTES)
+// ==========================================
+
+function carregarDadosEmpresa() {
+    document.getElementById('nomeEmpresa').value = dadosEmpresa.nome || '';
+    document.getElementById('cnpjEmpresa').value = dadosEmpresa.cnpj || '';
+    document.getElementById('inscricaoEstadual').value = dadosEmpresa.inscricaoEstadual || '';
+    document.getElementById('inscricaoMunicipal').value = dadosEmpresa.inscricaoMunicipal || '';
+    document.getElementById('enderecoEmpresa').value = dadosEmpresa.endereco || '';
+    document.getElementById('telefoneEmpresa').value = dadosEmpresa.telefone || '';
+    document.getElementById('celularEmpresa').value = dadosEmpresa.celular || '';
+    document.getElementById('emailEmpresa').value = dadosEmpresa.email || '';
+    document.getElementById('nomeResponsavel').value = dadosEmpresa.nomeResponsavel || '';
+    document.getElementById('cpfResponsavel').value = dadosEmpresa.cpfResponsavel || '';
+    document.getElementById('rgResponsavel').value = dadosEmpresa.rgResponsavel || '';
+    document.getElementById('cargoResponsavel').value = dadosEmpresa.cargoResponsavel || '';
+    document.getElementById('siteEmpresa').value = dadosEmpresa.site || '';
+    document.getElementById('instagramEmpresa').value = dadosEmpresa.instagram || '';
+    document.getElementById('dataFundacao').value = dadosEmpresa.dataFundacao || '';
+    document.getElementById('observacoesEmpresa').value = dadosEmpresa.observacoes || '';
+
+    atualizarResumoEmpresa();
+}
+
+function salvarDadosEmpresa(event) {
+    event.preventDefault();
+
+    dadosEmpresa = {
+        nome: document.getElementById('nomeEmpresa').value,
+        cnpj: document.getElementById('cnpjEmpresa').value,
+        inscricaoEstadual: document.getElementById('inscricaoEstadual').value,
+        inscricaoMunicipal: document.getElementById('inscricaoMunicipal').value,
+        endereco: document.getElementById('enderecoEmpresa').value,
+        telefone: document.getElementById('telefoneEmpresa').value,
+        celular: document.getElementById('celularEmpresa').value,
+        email: document.getElementById('emailEmpresa').value,
+        nomeResponsavel: document.getElementById('nomeResponsavel').value,
+        cpfResponsavel: document.getElementById('cpfResponsavel').value,
+        rgResponsavel: document.getElementById('rgResponsavel').value,
+        cargoResponsavel: document.getElementById('cargoResponsavel').value,
+        site: document.getElementById('siteEmpresa').value,
+        instagram: document.getElementById('instagramEmpresa').value,
+        dataFundacao: document.getElementById('dataFundacao').value,
+        observacoes: document.getElementById('observacoesEmpresa').value
+    };
+
+    atualizarResumoEmpresa();
+    salvarDados();
+    alert('✅ Dados da empresa salvos com sucesso!');
+}
+
+function atualizarResumoEmpresa() {
+    const nomeExibir = dadosEmpresa.nome || 'Minha Empresa';
+    const cnpjExibir = dadosEmpresa.cnpj ? 'CNPJ: ' + dadosEmpresa.cnpj : 'CNPJ não cadastrado';
+
+    document.getElementById('nomeEmpresaResumo').textContent = nomeExibir;
+    document.getElementById('cnpjEmpresaResumo').textContent = cnpjExibir;
+
+    const logoText = document.querySelector('.sidebar h2');
+    if (logoText && dadosEmpresa.nome) {
+        logoText.textContent = dadosEmpresa.nome;
+    }
+}
+
+function limparFormularioEmpresa() {
+    if (confirm('Limpar todos os campos do formulário?')) {
+        document.getElementById('nomeEmpresa').value = '';
+        document.getElementById('cnpjEmpresa').value = '';
+        document.getElementById('inscricaoEstadual').value = '';
+        document.getElementById('inscricaoMunicipal').value = '';
+        document.getElementById('enderecoEmpresa').value = '';
+        document.getElementById('telefoneEmpresa').value = '';
+        document.getElementById('celularEmpresa').value = '';
+        document.getElementById('emailEmpresa').value = '';
+        document.getElementById('nomeResponsavel').value = '';
+        document.getElementById('cpfResponsavel').value = '';
+        document.getElementById('rgResponsavel').value = '';
+        document.getElementById('cargoResponsavel').value = '';
+        document.getElementById('siteEmpresa').value = '';
+        document.getElementById('instagramEmpresa').value = '';
+        document.getElementById('dataFundacao').value = '';
+        document.getElementById('observacoesEmpresa').value = '';
+    }
+}
+
+// ==========================================
+// INICIALIZAÇÃO DO SISTEMA
+// ==========================================
+
 window.addEventListener('load', async function() {
     await carregarDados();
-    atualizarDashboard();
-    renderizarCanais();
-    renderizarKanban();
-    renderizarPedidosMes();
-    renderizarAcoes();
-    atualizarDRE();
-    renderizarClientes();
-    renderizarTransportadoras();
-    carregarDadosEmpresa();
-    console.log('✅ Sistema carregado com sucesso!');
+    verificarAutenticacao();
+    console.log('✅ Sistema Multi-empresa carregado com sucesso!');
 });
 
-// Auto-save a cada 30 segundos
 setInterval(salvarDados, 30000);
 
-// Atualizar dashboard a cada 1 minuto
 setInterval(function() {
     if (!document.getElementById('page-dashboard').classList.contains('hidden')) {
         atualizarDashboard();
