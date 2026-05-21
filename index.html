@@ -43,7 +43,6 @@
 </head>
 <body>
 
-<!-- TELA DE LOGIN MULTI-EMPRESA -->
 <div id="telaLogin" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; z-index: 99999;">
     <div style="background: white; border-radius: 16px; padding: 40px; max-width: 450px; width: 90%;">
         <div style="text-align: center; margin-bottom: 32px;">
@@ -53,65 +52,43 @@
             <h2 style="font-size: 24px; font-weight: bold;">Sistema de Gestão</h2>
             <p style="color: #6b7280; font-size: 14px; margin-top: 8px;">Acesso Multi-empresa</p>
         </div>
-        
         <form onsubmit="fazerLoginMultiempresa(event)">
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;">
-                    <i class="fas fa-user"></i> Login / Email
-                </label>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;"><i class="fas fa-user"></i> Login / Email</label>
                 <input type="text" id="loginUsuario" required autofocus style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Digite seu login ou email">
             </div>
-            
             <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;">
-                    <i class="fas fa-lock"></i> Senha
-                </label>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;"><i class="fas fa-lock"></i> Senha</label>
                 <input type="password" id="senhaUsuario" required style="width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Digite sua senha">
             </div>
-            
             <div id="erroLogin" class="hidden" style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; font-size: 14px;">
                 <i class="fas fa-exclamation-circle"></i> <span id="mensagemErroLogin">Usuário ou senha incorretos!</span>
             </div>
-            
-            <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+            <button type="submit" style="width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
                 <i class="fas fa-sign-in-alt"></i> Entrar
             </button>
         </form>
-        
         <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
-            <p style="font-size: 12px; color: #6b7280;">
-                <i class="fas fa-info-circle"></i> Primeiro acesso? Entre como <strong>admin</strong>
-            </p>
+            <p style="font-size: 12px; color: #6b7280;"><i class="fas fa-info-circle"></i> Primeiro acesso? Entre como <strong>admin</strong></p>
         </div>
     </div>
 </div>
 
-<!-- SIDEBAR DINÂMICA -->
 <div class="sidebar">
     <div style="padding: 20px; border-bottom: 1px solid #374151;">
-        <h2 id="nomeEmpresaSidebar" style="font-size: 20px; font-weight: bold;">Sistema de Gestão</h2>
+        <h2 id="nomeEmpresaSidebar" style="font-size: 20px; font-weight: bold;">Sistema</h2>
         <p id="usuarioLogadoInfo" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Não autenticado</p>
     </div>
-    <nav id="menuNavegacao" style="padding: 20px 0;">
-        <!-- Menu será carregado dinamicamente -->
-    </nav>
+    <nav id="menuNavegacao" style="padding: 20px 0;"></nav>
     <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid #374151; padding: 20px;">
-        <!-- Menu Administração (apenas para Super Admin) -->
         <div id="menuAdministracao" class="hidden">
             <p style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; padding: 0 20px;">Administração</p>
-            <div class="menu-item" onclick="irParaPagina('empresas')">
-                <i class="fas fa-building" style="width: 20px;"></i><span>Empresas</span>
-            </div>
-            <div class="menu-item" onclick="irParaPagina('usuarios')">
-                <i class="fas fa-users-cog" style="width: 20px;"></i><span>Usuários</span>
-            </div>
+            <div class="menu-item" onclick="irParaPagina('empresas')"><i class="fas fa-building" style="width: 20px;"></i><span>Empresas</span></div>
+            <div class="menu-item" onclick="irParaPagina('usuarios')"><i class="fas fa-users-cog" style="width: 20px;"></i><span>Usuários</span></div>
         </div>
-        
-        <!-- Configurações da Empresa Atual -->
         <div id="menuConfiguracoes" class="menu-item hidden" onclick="irParaPagina('configuracoes')">
             <i class="fas fa-building" style="width: 20px;"></i><span>Dados da Empresa</span>
         </div>
-        
         <div class="menu-item" style="color: #ef4444;" onclick="fazerLogout()">
             <i class="fas fa-sign-out-alt" style="width: 20px;"></i><span>Sair</span>
         </div>
@@ -122,23 +99,18 @@
     <header style="background: white; padding: 20px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <h1 id="page-title" style="font-size: 24px; font-weight: bold;">Sistema de Gestão</h1>
+                <h1 id="page-title" style="font-size: 24px; font-weight: bold;">Sistema</h1>
                 <span id="statusFirebase" style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #16a34a; background: #dcfce7; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
                     <span style="width: 8px; height: 8px; background: #16a34a; border-radius: 50%; animation: pulse 2s infinite;"></span>
                     Firebase OK
                 </span>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button onclick="exportarBackup()" class="btn" style="background: #16a34a; color: white; padding: 8px 16px;">
-                    <i class="fas fa-download"></i> Backup
-                </button>
-                <button onclick="importarBackup()" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px;">
-                    <i class="fas fa-upload"></i> Restaurar
-                </button>
+                <button onclick="exportarBackup()" class="btn" style="background: #16a34a; color: white; padding: 8px 16px;"><i class="fas fa-download"></i> Backup</button>
+                <button onclick="importarBackup()" class="btn" style="background: #f59e0b; color: white; padding: 8px 16px;"><i class="fas fa-upload"></i> Restaurar</button>
             </div>
         </div>
     </header>
-    
     <div style="padding: 40px;">
 
 <!-- DASHBOARD -->
@@ -455,7 +427,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                         <div>
                             <label style="display: block; font-weight: 600; margin-bottom: 8px;">📞 Telefone</label>
-                            <input type="tel" id="telefoneEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 0000-0000">
+                            <input type="tel" id="telefoneEmpresa" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px;" placeholder="(00) 00000-0000">
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; margin-bottom: 8px;">📱 Celular / WhatsApp</label>
@@ -1229,7 +1201,6 @@ console.log('🔥 Firebase inicializado!');
 // VARIÁVEIS GLOBAIS
 // ==========================================
 
-// Variáveis de contexto atual (carregadas da empresa ativa)
 let canaisVenda = [];
 let proximoIdCanal = 1;
 let gastos = [];
@@ -1265,15 +1236,12 @@ let dadosEmpresa = {
 let transportadoras = [];
 let proximoIdTransportadora = 1;
 
-// Variáveis Multi-empresa
 let empresas = [];
 let proximoIdEmpresa = 1;
 let usuarios = [];
 let proximoIdUsuario = 1;
 let usuarioLogado = null;
 let empresaAtual = null;
-
-// Dados isolados por empresa
 let dadosPorEmpresa = {};
 
 const MODULOS_SISTEMA = [
@@ -1484,7 +1452,6 @@ function verificarAutenticacao() {
 
 function fazerLogout() {
     if (confirm('Deseja sair do sistema?')) {
-        // Salvar contexto antes de sair
         if (empresaAtual) {
             salvarContextoEmpresa();
             salvarDados();
@@ -1532,7 +1499,7 @@ function carregarSistemaUsuario() {
         alert('⚠️ Você não tem permissão para acessar nenhum módulo.');
     }
     
-    console.log('✅ Contexto da empresa "' + (empresaAtual.nomeFantasia || empresaAtual.razaoSocial) + '" carregado');
+    console.log('✅ Contexto da empresa carregado');
 }
 
 function carregarMenuNavegacao(modulosPermitidos) {
@@ -2929,7 +2896,7 @@ function salvarVenda(event) {
 }
 
 // ==========================================
-// DRE
+// DRE ✅ CORRIGIDO - COM DATA
 // ==========================================
 
 function atualizarDRE() {
@@ -2961,7 +2928,7 @@ function atualizarDRE() {
                 <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e5e7eb; align-items: center;">
                     <div>
                         <p style="font-weight: 600;">${g.categoria}</p>
-                        <p style="font-size: 14px; color: #6b7280;">${g.descricao}</p>
+                        <p style="font-size: 14px; color: #6b7280;">${g.descricao} - ${new Date(g.data).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <p style="font-weight: 600; color: #dc2626;">R$ ${g.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
@@ -3006,7 +2973,7 @@ function excluirGasto(id) {
 }
 
 // ==========================================
-// CRM
+// CRM ✅ CORRIGIDO
 // ==========================================
 
 function renderizarKanban() {
@@ -3077,6 +3044,8 @@ function soltarCard(event, novaEtapaId) {
             const mes = String(hoje.getMonth() + 1).padStart(2, '0');
             const dia = String(hoje.getDate()).padStart(2, '0');
             const dataLocal = `${ano}-${mes}-${dia}`;
+            
+            negocio.dataFechamento = dataLocal;
             
             const novaVenda = {
                 id: proximoIdVenda++,
@@ -3234,15 +3203,53 @@ function salvarEdicaoNegocioCompleto(event) {
     }
 }
 
+// ✅ CORREÇÃO 1: Excluir negócio remove do faturamento
 function excluirNegocioDireto(negocioId) {
     const negocio = negocios.find(n => n.id === negocioId);
     if (!negocio) return;
     
-    if (confirm('Excluir negócio?\n\nCliente: ' + negocio.cliente)) {
+    const vendaRegistrada = vendasFechadasRegistro.find(v => v.negocioId === negocioId);
+    const pedidoRegistrado = pedidosEnviadosRegistro.find(p => p.negocioId === negocioId);
+    
+    let avisoExtra = '';
+    
+    if (vendaRegistrada) {
+        avisoExtra += '\n\n⚠️ ATENÇÃO: Este negócio tem uma VENDA REGISTRADA!\nValor: R$ ' + vendaRegistrada.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '\nData: ' + new Date(vendaRegistrada.dataFechamento).toLocaleDateString('pt-BR') + '\n\nA venda será REMOVIDA DO FATURAMENTO!';
+    }
+    
+    if (pedidoRegistrado) {
+        avisoExtra += '\n\n📦 Também há um PEDIDO REGISTRADO que será excluído.';
+    }
+    
+    if (confirm('❌ Excluir negócio?\n\nCliente: ' + negocio.cliente + '\nValor: R$ ' + negocio.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + avisoExtra)) {
         negocios = negocios.filter(n => n.id !== negocioId);
+        
+        if (vendaRegistrada) {
+            vendasFechadasRegistro = vendasFechadasRegistro.filter(v => v.negocioId !== negocioId);
+            
+            if (vendaRegistrada.canal) {
+                const canal = canaisVenda.find(c => c.id === parseInt(vendaRegistrada.canal));
+                if (canal && canal.vendas) {
+                    canal.vendas = canal.vendas.filter(v => 
+                        !(v.valor === vendaRegistrada.valor && 
+                          v.data === vendaRegistrada.dataFechamento &&
+                          v.descricao.includes(vendaRegistrada.cliente))
+                    );
+                }
+            }
+        }
+        
+        if (pedidoRegistrado) {
+            pedidosEnviadosRegistro = pedidosEnviadosRegistro.filter(p => p.negocioId !== negocioId);
+        }
+        
         renderizarKanban();
         salvarDados();
-        alert('✅ Negócio excluído!');
+        atualizarDashboard();
+        
+        alert('✅ Negócio excluído!' + 
+              (vendaRegistrada ? '\n💰 Faturamento atualizado!' : '') +
+              (pedidoRegistrado ? '\n📦 Pedido removido!' : ''));
     }
 }
 
@@ -3337,7 +3344,7 @@ function excluirColunaLivre(etapaId) {
 }
 
 // ==========================================
-// FUNÇÕES AUXILIARES TRANSPORTADORAS
+// PEDIDOS E AÇÕES
 // ==========================================
 
 function obterLinkRastreamento(pedido) {
@@ -3356,10 +3363,6 @@ function obterNomeTransportadora(pedido) {
     const transp = transportadoras.find(t => t.id === pedido.transportadoraId);
     return transp ? transp.nome : '';
 }
-
-// ==========================================
-// PEDIDOS
-// ==========================================
 
 function renderizarPedidosMes() {
     const container = document.getElementById('listaPedidosPorDia');
@@ -3521,10 +3524,6 @@ function salvarEdicaoPedidoEnviado(event) {
     }
 }
 
-// ==========================================
-// AÇÕES
-// ==========================================
-
 function renderizarAcoes() {
     const g = document.getElementById('gridAcoes');
     if (!g) return;
@@ -3578,7 +3577,7 @@ function excluirAcao(id) {
 }
 
 // ==========================================
-// CLIENTES
+// CLIENTES ✅ CORRIGIDO
 // ==========================================
 
 function gerarListaClientes() {
@@ -3707,14 +3706,14 @@ function renderizarClientes() {
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <h3 style="font-size: 18px; font-weight: 600;">${cliente.nome}</h3>
-                                    <span style="background: $${corStatus}20; color: $${corStatus}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <span style="background: ${corStatus}20; color: ${corStatus}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                                         ${labelStatus}
                                     </span>
                                     ${isVIP ? '<span style="background: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">⭐ VIP</span>' : ''}
                                 </div>
                                 <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
-                                    $${cliente.telefone ? `<span><i class="fas fa-phone"></i> $${cliente.telefone}</span>` : ''}
-                                    $${cliente.email ? `<span><i class="fas fa-envelope"></i> $${cliente.email}</span>` : ''}
+                                    ${cliente.telefone ? `<span><i class="fas fa-phone"></i> ${cliente.telefone}</span>` : ''}
+                                    ${cliente.email ? `<span><i class="fas fa-envelope"></i> ${cliente.email}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -3722,7 +3721,7 @@ function renderizarClientes() {
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px;">
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">💰 Valor Total</p>
-                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$$ $${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">🛒 Negócios</p>
@@ -3730,7 +3729,7 @@ function renderizarClientes() {
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📊 Ticket Médio</p>
-                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$$ $${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">📅 Última Compra</p>
@@ -3741,12 +3740,12 @@ function renderizarClientes() {
 
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 16px;">
                         ${cliente.telefone ? `
-                            <button onclick="abrirWhatsAppDireto('$${cliente.telefone}', '$${cliente.nome}')" class="btn" style="background: #25D366; color: white; padding: 8px 16px;">
+                            <button onclick="abrirWhatsAppDireto('${cliente.telefone}', '${cliente.nome}')" class="btn" style="background: #25D366; color: white; padding: 8px 16px;">
                                 <i class="fab fa-whatsapp"></i>
                             </button>
                         ` : ''}
                         ${cliente.email ? `
-                            <button onclick="abrirEmailCliente('$${cliente.email}', '$${cliente.nome}')" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
+                            <button onclick="abrirEmailCliente('${cliente.email}', '${cliente.nome}')" class="btn" style="background: #3b82f6; color: white; padding: 8px 16px;">
                                 <i class="fas fa-envelope"></i>
                             </button>
                         ` : ''}
@@ -3813,7 +3812,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total Gasto</p>
-                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$$ $${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #16a34a;">R$ ${cliente.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total de Negócios</p>
@@ -3821,7 +3820,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             </div>
             <div>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Ticket Médio</p>
-                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$$ $${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #3b82f6;">R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
             </div>
         </div>
     `;
@@ -3838,7 +3837,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
             <div style="border-left: 4px solid ${etapaCor}; background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <h4 style="font-size: 16px; font-weight: 600;">${n.titulo}</h4>
-                    <span style="background: $${etapaCor}20; color: $${etapaCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                    <span style="background: ${etapaCor}20; color: ${etapaCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                         ${etapaNome}
                     </span>
                 </div>
@@ -3847,7 +3846,7 @@ function abrirModalHistoricoCliente(nomeCliente) {
                         <i class="fas fa-calendar"></i> ${new Date(n.data).toLocaleDateString('pt-BR')}
                     </p>
                     <p style="font-size: 18px; font-weight: bold; color: #16a34a;">
-                        R$$ $${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        R$ ${n.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                     </p>
                 </div>
             </div>
@@ -3923,7 +3922,7 @@ function exportarClientes() {
 }
 
 // ==========================================
-// TRANSPORTADORAS
+// TRANSPORTADORAS ✅ CORRIGIDO (SEM $ PERDIDO)
 // ==========================================
 
 function renderizarTransportadoras() {
@@ -3956,13 +3955,13 @@ function renderizarTransportadoras() {
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                     <h3 style="font-size: 18px; font-weight: 600;">${t.nome}</h3>
-                                    <span style="background: $${statusCor}20; color: $${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <span style="background: ${statusCor}20; color: ${statusCor}; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                                         ${statusLabel}
                                     </span>
                                 </div>
                                 <div style="display: flex; gap: 16px; font-size: 14px; color: #6b7280;">
-                                    $${t.telefone ? `<span><i class="fas fa-phone"></i> $${t.telefone}</span>` : ''}
-                                    $${t.email ? `<span><i class="fas fa-envelope"></i> $${t.email}</span>` : ''}
+                                    ${t.telefone ? `<span><i class="fas fa-phone"></i> ${t.telefone}</span>` : ''}
+                                    ${t.email ? `<span><i class="fas fa-envelope"></i> ${t.email}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -3972,7 +3971,7 @@ function renderizarTransportadoras() {
                             <p style="font-size: 14px; font-family: monospace; word-break: break-all;">${t.linkRastreamento}</p>
                         </div>
 
-                        $${t.cnpj ? `<div style="font-size: 14px; color: #6b7280;"><i class="fas fa-file-alt"></i> CNPJ: $${t.cnpj}</div>` : ''}
+                        ${t.cnpj ? `<div style="font-size: 14px; color: #6b7280;"><i class="fas fa-file-alt"></i> CNPJ: ${t.cnpj}</div>` : ''}
 
                         <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-top: 12px;">
                             <p style="font-size: 14px; color: #1e40af;">
@@ -4124,7 +4123,7 @@ function salvarDadosEmpresa(event) {
         inscricaoEstadual: document.getElementById('inscricaoEstadual').value,
         inscricaoMunicipal: document.getElementById('inscricaoMunicipal').value,
         endereco: document.getElementById('enderecoEmpresa').value,
-telefone: document.getElementById('telefoneEmpresa').value,
+        telefone: document.getElementById('telefoneEmpresa').value,
         celular: document.getElementById('celularEmpresa').value,
         email: document.getElementById('emailEmpresa').value,
         nomeResponsavel: document.getElementById('nomeResponsavel').value,
@@ -4172,13 +4171,13 @@ function limparFormularioEmpresa() {
 }
 
 // ==========================================
-// INICIALIZAÇÃO DO SISTEMA
+// INICIALIZAÇÃO DO SISTEMA ✅
 // ==========================================
 
 window.addEventListener('load', async function() {
     await carregarDados();
     verificarAutenticacao();
-    console.log('✅ Sistema Multi-empresa com isolamento carregado!');
+    console.log('✅ Sistema Multi-empresa com isolamento e correções carregado!');
 });
 
 setInterval(function() {
